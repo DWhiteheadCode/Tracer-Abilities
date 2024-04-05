@@ -53,8 +53,15 @@ void UTAction::StopAction_Implementation(AActor* Instigator)
 
 bool UTAction::CanStart_Implementation(AActor* Instigator)
 {
-	if (IsRunning() || bIsOnCooldown)
+	if (IsRunning())
 	{
+		UE_LOG(LogTemp, Log, TEXT("Action [%s] can't start: Already running"), *GetNameSafe(this));
+		return false;
+	}
+
+	if (bIsOnCooldown)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Action [%s] can't start: On Cooldown"), *GetNameSafe(this));
 		return false;
 	}
 
@@ -62,6 +69,7 @@ bool UTAction::CanStart_Implementation(AActor* Instigator)
 
 	if (ActionComp->ActiveGameplayTags.HasAny(BlockedByTags))
 	{
+		UE_LOG(LogTemp, Log, TEXT("Action [%s] can't start: Blocked By Tags"), *GetNameSafe(this));
 		return false;
 	}
 
@@ -75,6 +83,7 @@ bool UTAction::IsRunning() const
 
 void UTAction::OnCooldownEnd()
 {
+	UE_LOG(LogTemp, Log, TEXT("Action cooldown ended: %s"), *GetNameSafe(this));
 	bIsOnCooldown = false;
 }
 

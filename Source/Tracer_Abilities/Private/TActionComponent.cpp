@@ -64,3 +64,13 @@ bool UTActionComponent::StopActionByTag(AActor* Instigator, FGameplayTag ActionT
 
 	return false;
 }
+
+void UTActionComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	for (TSubclassOf<UTAction> ActionClass : DefaultActions)
+	{
+		AddAction(ActionClass);
+	}
+}

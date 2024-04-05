@@ -31,8 +31,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Tags")
 	FGameplayTagContainer ActiveGameplayTags;
 
+	void BeginPlay() override;
+
 protected:
 	UPROPERTY()
 	TArray<UTAction*> Actions;
 	
+	UPROPERTY(EditAnywhere, Category = "Actions")
+	TArray<TSubclassOf<UTAction>> DefaultActions;
+
 };

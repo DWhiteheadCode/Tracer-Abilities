@@ -42,9 +42,9 @@ void ATCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ATCharacter::Jump);
 
 		// Abilities
-		EnhancedInputComponent->BindAction(PrimaryAbilityAction, ETriggerEvent::Triggered, this, &ATCharacter::StartPrimaryAbility);
-		EnhancedInputComponent->BindAction(SecondaryAbilityAction, ETriggerEvent::Triggered, this, &ATCharacter::StartSecondaryAbility);
-		EnhancedInputComponent->BindAction(UltimateAbilityAction, ETriggerEvent::Triggered, this, &ATCharacter::StartUltimateAbility);
+		EnhancedInputComponent->BindAction(PrimaryAbilityAction, ETriggerEvent::Started, this, &ATCharacter::StartPrimaryAbility);
+		EnhancedInputComponent->BindAction(SecondaryAbilityAction, ETriggerEvent::Started, this, &ATCharacter::StartSecondaryAbility);
+		EnhancedInputComponent->BindAction(UltimateAbilityAction, ETriggerEvent::Started, this, &ATCharacter::StartUltimateAbility);
 	}
 }
 

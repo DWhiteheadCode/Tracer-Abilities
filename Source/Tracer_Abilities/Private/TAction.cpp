@@ -8,7 +8,7 @@
 UTAction::UTAction()
 {
 	bIsRunning = false;
-	bIsOnCooldown;
+	bIsOnCooldown = false;
 	Cooldown = 5;
 }
 
@@ -60,7 +60,6 @@ bool UTAction::CanStart_Implementation(AActor* Instigator)
 
 	return true;
 }
-
 
 bool UTAction::IsRunning() const
 {

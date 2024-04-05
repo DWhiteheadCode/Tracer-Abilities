@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 
 #include "InputActionValue.h"
+#include "GameplayTagContainer.h"
 
 #include "TCharacter.generated.h"
 
@@ -55,4 +56,32 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* JumpAction;
 	
+	// Primary Ability
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* PrimaryAbilityAction;
+
+	UFUNCTION()
+	void StartPrimaryAbility();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	FGameplayTag PrimaryAbilityTag;
+
+	// Secondary Ability 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* SecondaryAbilityAction;
+
+	void StartSecondaryAbility();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	FGameplayTag SecondaryAbilityTag;
+
+	// Ultimate Ability
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* UltimateAbilityAction;
+
+	void StartUltimateAbility();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	FGameplayTag UltimateAbilityTag;
+
 };

@@ -36,9 +36,15 @@ void ATCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
+		// Movement
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ATCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ATCharacter::Jump);
+
+		// Abilities
+		EnhancedInputComponent->BindAction(PrimaryAbilityAction, ETriggerEvent::Triggered, this, &ATCharacter::StartPrimaryAbility);
+		EnhancedInputComponent->BindAction(SecondaryAbilityAction, ETriggerEvent::Triggered, this, &ATCharacter::StartSecondaryAbility);
+		EnhancedInputComponent->BindAction(UltimateAbilityAction, ETriggerEvent::Triggered, this, &ATCharacter::StartUltimateAbility);
 	}
 }
 
@@ -65,4 +71,19 @@ void ATCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookValue.X);
 		AddControllerPitchInput(LookValue.Y);
 	}
+}
+
+void ATCharacter::StartPrimaryAbility()
+{
+	ActionComp->StartActionByTag(this, PrimaryAbilityTag);
+}
+
+void ATCharacter::StartSecondaryAbility()
+{
+	ActionComp->StartActionByTag(this, SecondaryAbilityTag);
+}
+
+void ATCharacter::StartUltimateAbility()
+{
+	ActionComp->StartActionByTag(this, UltimateAbilityTag);
 }

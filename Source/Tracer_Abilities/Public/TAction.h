@@ -49,9 +49,16 @@ protected:
 
 	bool bIsRunning;
 
+	// ACTIVE DURATION ---------------------------------------
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	float ActiveDuration;
+
+	FTimerHandle TimerHandle_ActiveDuration;
+
+	// COOLDOWN ----------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	float Cooldown;
-
+	
 	FTimerHandle TimerHandle_Cooldown;
 
 	bool bIsOnCooldown;

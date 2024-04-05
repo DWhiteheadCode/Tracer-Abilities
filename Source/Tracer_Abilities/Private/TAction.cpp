@@ -9,7 +9,8 @@ UTAction::UTAction()
 {
 	bIsRunning = false;
 	bIsOnCooldown = false;
-	Cooldown = 5;
+	Cooldown = 15;
+	ActiveDuration = 5;
 }
 
 void UTAction::StartAction_Implementation(AActor* Instigator)
@@ -25,8 +26,14 @@ void UTAction::StartAction_Implementation(AActor* Instigator)
 	ActionComp->ActiveGameplayTags.AppendTags(GrantsTags);
 	bIsRunning = true;
 	
+	// Start cooldown
 	bIsOnCooldown = true;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Cooldown, this, &UTAction::OnCooldownEnd, Cooldown, false);
+	
+	// Start active duration
+	FTimerDelegate Delegate;
+	Delegate.BindUFunction(this, "StopAction", Instigator);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_ActiveDuration, Delegate, ActiveDuration, false);
 }
 
 void UTAction::StopAction_Implementation(AActor* Instigator)
@@ -66,12 +73,12 @@ bool UTAction::IsRunning() const
 	return bIsRunning;
 }
 
-UTActionComponent* UTAction::GetOwningComponent() const
-{
-	return Cast<UTActionComponent>(GetOuter());
-}
-
 void UTAction::OnCooldownEnd()
 {
 	bIsOnCooldown = false;
+}
+
+UTActionComponent* UTAction::GetOwningComponent() const
+{
+	return Cast<UTActionComponent>(GetOuter());
 }

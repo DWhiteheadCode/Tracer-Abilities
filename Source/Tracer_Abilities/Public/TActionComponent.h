@@ -28,17 +28,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Actions")
 	bool StopActionByTag(AActor* Instigator, FGameplayTag ActionTag);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Tags")
 	FGameplayTagContainer ActiveGameplayTags;
 
 protected:
 	UPROPERTY()
 	TArray<UTAction*> Actions;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Tags")
-	FGameplayTagContainer GrantsTags;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Tags")
-	FGameplayTagContainer BlockedTags;
-		
+	
 };

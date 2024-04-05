@@ -5,13 +5,28 @@
 
 #include "TActionComponent.h"
 
+UTAction::UTAction()
+{
+	bIsRunning = false;
+	bIsOnCooldown;
+	Cooldown = 5;
+}
+
 void UTAction::StartAction_Implementation(AActor* Instigator)
 {
+	if (!ensureAlways(CanStart(Instigator)))
+	{
+		return;
+	}
+
 	UE_LOG(LogTemp, Log, TEXT("Started Action: %s"), *GetNameSafe(this));
 
 	UTActionComponent* ActionComp = GetOwningComponent();
 	ActionComp->ActiveGameplayTags.AppendTags(GrantsTags);
 	bIsRunning = true;
+	
+	bIsOnCooldown = true;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Cooldown, this, &UTAction::OnCooldownEnd, Cooldown, false);
 }
 
 void UTAction::StopAction_Implementation(AActor* Instigator)
@@ -31,7 +46,7 @@ void UTAction::StopAction_Implementation(AActor* Instigator)
 
 bool UTAction::CanStart_Implementation(AActor* Instigator)
 {
-	if (IsRunning())
+	if (IsRunning() || bIsOnCooldown)
 	{
 		return false;
 	}
@@ -46,6 +61,7 @@ bool UTAction::CanStart_Implementation(AActor* Instigator)
 	return true;
 }
 
+
 bool UTAction::IsRunning() const
 {
 	return bIsRunning;
@@ -54,4 +70,9 @@ bool UTAction::IsRunning() const
 UTActionComponent* UTAction::GetOwningComponent() const
 {
 	return Cast<UTActionComponent>(GetOuter());
+}
+
+void UTAction::OnCooldownEnd()
+{
+	bIsOnCooldown = false;
 }

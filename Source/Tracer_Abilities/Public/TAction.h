@@ -20,6 +20,8 @@ class TRACER_ABILITIES_API UTAction : public UObject
 	GENERATED_BODY()
 
 public:
+	UTAction();
+
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	FGameplayTag IdentifierTag;
 
@@ -46,5 +48,15 @@ protected:
 	UTActionComponent* GetOwningComponent() const;
 
 	bool bIsRunning;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	float Cooldown;
+
+	FTimerHandle TimerHandle_Cooldown;
+
+	bool bIsOnCooldown;
+
+	UFUNCTION()
+	void OnCooldownEnd();
 	
 };

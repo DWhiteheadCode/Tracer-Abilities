@@ -6,11 +6,14 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "TActionComponent.h"
 
 ATCharacter::ATCharacter()
 {
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(RootComponent);
+
+	ActionComp = CreateDefaultSubobject<UTActionComponent>("Action Component");
 }
 
 void ATCharacter::BeginPlay()

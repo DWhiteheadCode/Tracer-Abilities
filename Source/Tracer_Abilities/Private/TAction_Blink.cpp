@@ -47,7 +47,7 @@ FVector UTAction_Blink::GetTeleportDestination(ATCharacter* CharacterToTeleport)
 	FVector StartLocation = CharacterToTeleport->GetActorLocation();
 	FVector EndLocation = StartLocation + (CharacterToTeleport->GetLastMovementInputVector() * MaxBlinkDistance);
 
-	//DrawDebugSphere(GetWorld(), StartLocation, 2, 8, FColor::Blue, false, 5.0f);
+	DrawDebugSphere(GetWorld(), StartLocation, 2, 8, FColor::Green, false, 5.0f);
 	DrawDebugSphere(GetWorld(), EndLocation, 2, 8, FColor::Blue, false, 5.0f);
 
 	FCollisionObjectQueryParams Params;
@@ -65,6 +65,8 @@ FVector UTAction_Blink::GetTeleportDestination(ATCharacter* CharacterToTeleport)
 
 		if (GetWorld()->SweepSingleByObjectType(HitResult, StartLocation, EndLocation, FQuat::Identity, Params, Shape))
 		{
+			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 2, 8, FColor::Red, false, 5.0f);
+
 			FVector ReversedSweepDirection = StartLocation - EndLocation;
 			ReversedSweepDirection.Normalize();
 

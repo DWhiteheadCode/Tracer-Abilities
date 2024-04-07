@@ -4,7 +4,7 @@
 #include "TAction_Blink.h"
 
 #include "TActionComponent.h"
-#include "TCharacter.h"
+#include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
 
 UTAction_Blink::UTAction_Blink()
@@ -22,7 +22,7 @@ void UTAction_Blink::StartAction_Implementation(AActor* Instigator)
 		return;
 	}
 
-	ATCharacter* OwningCharacter = Cast<ATCharacter>(OwningComp->GetOwner());
+	ACharacter* OwningCharacter = Cast<ACharacter>(OwningComp->GetOwner());
 	if (!ensure(OwningCharacter))
 	{
 		return;
@@ -35,7 +35,7 @@ void UTAction_Blink::StartAction_Implementation(AActor* Instigator)
 	StopAction(Instigator);
 }
 
-FVector UTAction_Blink::GetTeleportDestination(ATCharacter* CharacterToTeleport)
+FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
 {
 	if (!ensure(CharacterToTeleport))
 	{

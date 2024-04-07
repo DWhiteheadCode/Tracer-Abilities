@@ -6,7 +6,7 @@
 #include "TAction.h"
 #include "TAction_Blink.generated.h"
 
-class ATCharacter;
+class ACharacter;
 
 /**
  * 
@@ -26,5 +26,5 @@ public:
 	void StartAction_Implementation(AActor* Instigator) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Blink")
-	FVector GetTeleportDestination(ATCharacter* CharacterToTeleport);
+	FVector GetTeleportDestination(ACharacter* CharacterToTeleport);
 };

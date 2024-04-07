@@ -45,7 +45,14 @@ FVector UTAction_Blink::GetTeleportDestination(ATCharacter* CharacterToTeleport)
 	FHitResult HitResult;
 
 	FVector StartLocation = CharacterToTeleport->GetActorLocation();
-	FVector EndLocation = StartLocation + (CharacterToTeleport->GetLastMovementInputVector() * MaxBlinkDistance);
+	FVector InputDirection = CharacterToTeleport->GetLastMovementInputVector();
+
+	if (InputDirection == FVector::Zero())
+	{
+		InputDirection = CharacterToTeleport->GetActorForwardVector();
+	}
+
+	FVector EndLocation = StartLocation + (InputDirection * MaxBlinkDistance);
 
 	DrawDebugSphere(GetWorld(), StartLocation, 2, 8, FColor::Green, false, 5.0f);
 	DrawDebugSphere(GetWorld(), EndLocation, 2, 8, FColor::Blue, false, 5.0f);

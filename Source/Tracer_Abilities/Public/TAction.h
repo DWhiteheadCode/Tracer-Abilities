@@ -22,7 +22,7 @@ class TRACER_ABILITIES_API UTAction : public UObject
 public:
 	UTAction();
 
-	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	UPROPERTY(EditAnywhere, Category = "Action")
 	FGameplayTag IdentifierTag;
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
@@ -38,10 +38,10 @@ public:
 	bool IsRunning() const;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Tags")
+	UPROPERTY(EditAnywhere, Category = "Tags")
 	FGameplayTagContainer GrantsTags;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Tags")
+	UPROPERTY(EditAnywhere, Category = "Tags")
 	FGameplayTagContainer BlockedByTags;
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
@@ -50,13 +50,13 @@ protected:
 	bool bIsRunning;
 
 	// ACTIVE DURATION ---------------------------------------
-	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	UPROPERTY(EditAnywhere, Category = "Action")
 	float ActiveDuration;
 
 	FTimerHandle TimerHandle_ActiveDuration;
 
 	// COOLDOWN ----------------------------------------------
-	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	UPROPERTY(EditAnywhere, Category = "Action")
 	float Cooldown;
 	
 	FTimerHandle TimerHandle_Cooldown;

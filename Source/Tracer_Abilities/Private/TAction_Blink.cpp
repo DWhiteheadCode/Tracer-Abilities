@@ -6,6 +6,7 @@
 #include "TActionComponent.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UTAction_Blink::UTAction_Blink()
 {
@@ -29,6 +30,19 @@ void UTAction_Blink::StartAction_Implementation(AActor* Instigator)
 	}
 
 	FVector Destination = GetTeleportDestination(OwningCharacter);
+
+	// Manually update the character's velocity to prevent carrying momentum in the opposite direction of the blink
+	if (UCharacterMovementComponent* MoveComp = OwningCharacter->GetCharacterMovement())
+	{
+		FVector OldVelocity = MoveComp->Velocity;
+		OldVelocity.Z = 0; // Ignore vertical velocity
+		float Speed = OldVelocity.Size();
+
+		FVector InputDirection = OwningCharacter->GetLastMovementInputVector();
+		InputDirection.Normalize();
+
+		MoveComp->Velocity = InputDirection * Speed;
+	}
 
 	OwningCharacter->TeleportTo(Destination, OwningCharacter->GetActorRotation());
 

@@ -9,7 +9,7 @@
 
 UTAction_Blink::UTAction_Blink()
 {
-	MaxBlinkDistance = 250;
+	MaxBlinkDistance = 350;
 }
 
 void UTAction_Blink::StartAction_Implementation(AActor* Instigator)

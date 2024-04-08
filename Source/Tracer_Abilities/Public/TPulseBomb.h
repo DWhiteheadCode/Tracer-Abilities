@@ -7,6 +7,7 @@
 #include "TPulseBomb.generated.h"
 
 class UStaticMeshComponent;
+class USphereComponent;
 class UProjectileMovementComponent;
 
 UCLASS()
@@ -20,15 +21,21 @@ public:
 protected:
 	void BeginPlay() override;
 
+	void PostInitializeComponents() override;
+
 	// COMPONENTS ---------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* MeshComp;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USphereComponent* CollisionSphereComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UProjectileMovementComponent* ProjectileMovementComp;
 
 	// BALANCE ------------------------------------------------
+	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
+	float StickRadius;
 	
 	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
 	float ExplosionRadius;
@@ -41,4 +48,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void Explode();
+
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 };

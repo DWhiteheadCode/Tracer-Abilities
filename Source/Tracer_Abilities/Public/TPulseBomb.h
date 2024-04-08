@@ -7,6 +7,7 @@
 #include "TPulseBomb.generated.h"
 
 class UStaticMeshComponent;
+class UProjectileMovementComponent;
 
 UCLASS()
 class TRACER_ABILITIES_API ATPulseBomb : public AActor
@@ -19,15 +20,23 @@ public:
 protected:
 	void BeginPlay() override;
 
+	// COMPONENTS ---------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* MeshComp;
 
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UProjectileMovementComponent* ProjectileMovementComp;
+
+	// BALANCE ------------------------------------------------
+	
 	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
 	float ExplosionRadius;
 
 	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
 	float ExplosionDelay;
 
+	// OTHER --------------------------------------------------
 	FTimerHandle TimerHandle_Explosion;
 
 	UFUNCTION(BlueprintCallable)

@@ -4,11 +4,16 @@
 #include "TPulseBomb.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 ATPulseBomb::ATPulseBomb()
 {
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
 	RootComponent = MeshComp;
+
+	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComp");
+	ProjectileMovementComp->ProjectileGravityScale = 1;
+
 
 	ExplosionDelay = 2;
 	ExplosionRadius = 200;

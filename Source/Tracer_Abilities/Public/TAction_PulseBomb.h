@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "TAction.h"
 #include "TAction_PulseBomb.generated.h"
+
+class ATPulseBomb;
+
 /**
  * 
  */
@@ -13,4 +16,10 @@ class TRACER_ABILITIES_API UTAction_PulseBomb : public UTAction
 {
 	GENERATED_BODY()
 	
+public:
+	void StartAction_Implementation() override;
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
+	TSubclassOf<AActor> ProjectileClass;
 };

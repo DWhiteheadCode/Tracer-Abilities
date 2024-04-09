@@ -63,6 +63,12 @@ bool UTAction::CanStart_Implementation()
 		return false;
 	}
 
+	if (ActiveDuration <= 0.0f)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Action [%s] can't start: Invalid ActiveDuration (must be >= 0)"), *GetNameSafe(this));
+		return false;
+	}
+
 	UTActionComponent* ActionComp = GetOwningComponent();
 
 	if (ActionComp->ActiveGameplayTags.HasAny(BlockedByTags))

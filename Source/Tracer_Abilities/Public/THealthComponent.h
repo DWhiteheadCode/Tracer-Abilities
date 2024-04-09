@@ -16,15 +16,16 @@ class TRACER_ABILITIES_API UTHealthComponent : public UActorComponent
 public:	
 	UTHealthComponent();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Health")
 	float GetHealth() const;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Health")
 	float GetHealthMax() const;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Health")
 	void ApplyDamage(float Damage);
 
+	UPROPERTY(BlueprintAssignable, Category = "Health")
 	FOnHealthChanged OnHealthChanged;
 
 protected:

@@ -36,7 +36,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UTActionComponent* ActionComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UTHealthComponent* HealthComp;
 
 	// INPUT --------------------------------------------------------------

@@ -14,6 +14,7 @@ class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
 class UTActionComponent;
+class UTHealthComponent;
 
 UCLASS()
 class TRACER_ABILITIES_API ATCharacter : public ACharacter
@@ -34,6 +35,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UTActionComponent* ActionComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UTHealthComponent* HealthComp;
 
 	// INPUT --------------------------------------------------------------
 	// IMC

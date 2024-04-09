@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "TActionComponent.h"
+#include "THealthComponent.h"
 
 ATCharacter::ATCharacter()
 {
@@ -14,6 +15,8 @@ ATCharacter::ATCharacter()
 	CameraComp->SetupAttachment(RootComponent);
 
 	ActionComp = CreateDefaultSubobject<UTActionComponent>("Action Component");
+
+	HealthComp = CreateDefaultSubobject<UTHealthComponent>("Health Component");
 }
 
 void ATCharacter::BeginPlay()

@@ -55,11 +55,32 @@ void ATPulseBomb::Explode()
 void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor != GetInstigator())
+	if (OtherActor == GetInstigator())
 	{
-		UE_LOG(LogTemp, Log, TEXT("PULSE BOMB OVERLAPPED"));
-
-		// Should only stick to first actor it overlaps with
-		CollisionSphereComp->SetGenerateOverlapEvents(false);
+		return;
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("PULSE BOMB OVERLAPPED"));
+
+	// Only stick to first actor it overlaps with
+	CollisionSphereComp->SetGenerateOverlapEvents(false);
+
+	ProjectileMovementComp->SetVelocityInLocalSpace(FVector::Zero());
+	ProjectileMovementComp->ProjectileGravityScale = 0;
+
+	if (OtherActor == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pulse bomb overlapped with null OtherActor"));
+		return;
+	}
+
+	APawn* OtherPawn = Cast<APawn>(OtherActor);
+
+	if (OtherPawn)
+	{
+		MeshComp->SetVisibility(false);
+
+		FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
+		AttachToActor(OtherPawn, TransformRules);
+	}	
 }

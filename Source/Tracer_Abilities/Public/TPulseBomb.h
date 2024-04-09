@@ -50,10 +50,10 @@ protected:
 	float ExplosionDelay;
 
 	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
-	float MinDamage;
+	int MinDamage;
 
 	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
-	float MaxDamage;
+	int MaxDamage;
 
 	// OTHER --------------------------------------------------
 	FTimerHandle TimerHandle_Explosion;
@@ -62,7 +62,7 @@ protected:
 	void Explode();
 
 	UFUNCTION(BlueprintCallable)
-	float CalculateDamage(AActor* ActorToDamage);
+	int CalculateDamage(AActor* ActorToDamage);
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 

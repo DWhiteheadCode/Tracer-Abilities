@@ -9,17 +9,17 @@ UTHealthComponent::UTHealthComponent()
 	HealthMax = 100;
 }
 
-float UTHealthComponent::GetHealth() const
+int UTHealthComponent::GetHealth() const
 {
 	return Health;
 }
 
-float UTHealthComponent::GetHealthMax() const
+int UTHealthComponent::GetHealthMax() const
 {
 	return HealthMax;
 }
 
-void UTHealthComponent::ApplyDamage(float Damage)
+void UTHealthComponent::ApplyDamage(int Damage)
 {
 	if (!ensure(Damage >= 0))
 	{

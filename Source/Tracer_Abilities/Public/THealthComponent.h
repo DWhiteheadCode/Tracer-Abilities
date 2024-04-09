@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "THealthComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnHealthChanged, UTHealthComponent*, OwningComponent, float, NewHealth, float, ActualDelta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnHealthChanged, UTHealthComponent*, OwningComponent, int, NewHealth, int, ActualDelta);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TRACER_ABILITIES_API UTHealthComponent : public UActorComponent
@@ -17,22 +17,22 @@ public:
 	UTHealthComponent();
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	float GetHealth() const;
+	int GetHealth() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	float GetHealthMax() const;
+	int GetHealthMax() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	void ApplyDamage(float Damage);
+	void ApplyDamage(int Damage);
 
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 	FOnHealthChanged OnHealthChanged;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Health")
-	float Health;
+	int Health;
 
 	UPROPERTY(EditAnywhere, Category = "Health")
-	float HealthMax;
+	int HealthMax;
 
 };

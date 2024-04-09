@@ -78,31 +78,31 @@ void ATPulseBomb::Explode()
 	SetLifeSpan(2.f);
 }
 
-float ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
+int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 {
 	if (! ensureMsgf(ExplosionRadius > 0, TEXT("Invalid explosion radius. Must be > 0")))
 	{
-		return 0.0f;
+		return 0;
 	}
 
 	if (!ensure(ActorToDamage))
 	{
-		return 0.0f;
+		return 0;
 	}
 
 	float Distance = FVector::Distance(GetActorLocation(), ActorToDamage->GetActorLocation());
 
 	if (Distance > ExplosionRadius)
 	{
-		return 0.0f;
+		return 0;
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("Distance to bomb: %f"), Distance);
 
 	// Deal MaxDamage at 0 distance, scaling linearly down to MinDamage if Distance == ExplosionRadius
-	float Damage = FMath::Lerp(MaxDamage, MinDamage, (Distance / ExplosionRadius));
+	int Damage = FMath::Lerp(MaxDamage, MinDamage, (Distance / ExplosionRadius));
 
-	UE_LOG(LogTemp, Log, TEXT("Damage from bomb: %f"), Damage);
+	UE_LOG(LogTemp, Log, TEXT("Damage from bomb: %i"), Damage);
 
 	return Damage;
 }

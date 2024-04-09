@@ -25,13 +25,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ApplyDamage(float Damage);
 
+	FOnHealthChanged OnHealthChanged;
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Health")
 	float Health;
 
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float HealthMax;
-
-	FOnHealthChanged OnHealthChanged;
 
 };

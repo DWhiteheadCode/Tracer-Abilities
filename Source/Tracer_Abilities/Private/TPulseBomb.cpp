@@ -9,23 +9,30 @@
 
 ATPulseBomb::ATPulseBomb()
 {
+	StickRadius = 20;
+	ExplosionDelay = 2;
+	ExplosionRadius = 200;
+
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
 	MeshComp->SetCollisionProfileName("NoCollision");
 	RootComponent = MeshComp;
 
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComp");
-	ProjectileMovementComp->ProjectileGravityScale = 1;
-
-	StickRadius = 20;
+	ProjectileMovementComp->InitialSpeed = 1250;
+	ProjectileMovementComp->ProjectileGravityScale = 3;
 
 	CollisionSphereComp = CreateDefaultSubobject<USphereComponent>("CollisionSphereComp");
 	CollisionSphereComp->SetupAttachment(RootComponent);
 	CollisionSphereComp->SetSphereRadius(StickRadius);
 	CollisionSphereComp->SetCollisionProfileName("Projectile");
 	CollisionSphereComp->SetGenerateOverlapEvents(true);
+}
 
-	ExplosionDelay = 2;
-	ExplosionRadius = 200;
+void ATPulseBomb::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	CollisionSphereComp->OnComponentBeginOverlap.AddDynamic(this, &ATPulseBomb::OnBeginOverlap);
 }
 
 void ATPulseBomb::BeginPlay()
@@ -35,12 +42,6 @@ void ATPulseBomb::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Explosion, this, &ATPulseBomb::Explode, ExplosionDelay, false);
 }
 
-void ATPulseBomb::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	CollisionSphereComp->OnComponentBeginOverlap.AddDynamic(this, &ATPulseBomb::OnBeginOverlap);
-}
 
 void ATPulseBomb::Explode()
 {
@@ -54,8 +55,11 @@ void ATPulseBomb::Explode()
 void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Log, TEXT("PULSE BOMB OVERLAPPED"));
+	if (OtherActor != GetInstigator())
+	{
+		UE_LOG(LogTemp, Log, TEXT("PULSE BOMB OVERLAPPED"));
 
-	// Should only stick to first actor it overlaps with
-	CollisionSphereComp->SetGenerateOverlapEvents(false);
+		// Should only stick to first actor it overlaps with
+		CollisionSphereComp->SetGenerateOverlapEvents(false);
+	}
 }

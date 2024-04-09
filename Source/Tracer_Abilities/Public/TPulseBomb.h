@@ -35,6 +35,12 @@ protected:
 
 	// BALANCE ------------------------------------------------
 	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
+	float Gravity;
+
+	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
+	float Speed;
+		
+	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
 	float StickRadius;
 	
 	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")

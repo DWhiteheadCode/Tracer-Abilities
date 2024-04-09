@@ -90,7 +90,7 @@ float ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 		return 0.0f;
 	}
 
-	float Distance = ( GetActorLocation() - ActorToDamage->GetActorLocation() ).Size();
+	float Distance = FVector::Distance(GetActorLocation(), ActorToDamage->GetActorLocation());
 
 	if (Distance > ExplosionRadius)
 	{

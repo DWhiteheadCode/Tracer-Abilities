@@ -43,17 +43,26 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
 	float StickRadius;
 	
-	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pulse Bomb")
 	float ExplosionRadius;
 
 	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
 	float ExplosionDelay;
+
+	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
+	float MinDamage;
+
+	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
+	float MaxDamage;
 
 	// OTHER --------------------------------------------------
 	FTimerHandle TimerHandle_Explosion;
 
 	UFUNCTION(BlueprintCallable)
 	void Explode();
+
+	UFUNCTION(BlueprintCallable)
+	float CalculateDamage(AActor* ActorToDamage);
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 

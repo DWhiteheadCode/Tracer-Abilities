@@ -75,15 +75,15 @@ void ATCharacter::Look(const FInputActionValue& Value)
 
 void ATCharacter::StartPrimaryAbility()
 {
-	ActionComp->StartActionByTag(this, PrimaryAbilityTag);
+	ActionComp->StartActionByTag(PrimaryAbilityTag);
 }
 
 void ATCharacter::StartSecondaryAbility()
 {
-	ActionComp->StartActionByTag(this, SecondaryAbilityTag);
+	ActionComp->StartActionByTag(SecondaryAbilityTag);
 }
 
 void ATCharacter::StartUltimateAbility()
 {
-	ActionComp->StartActionByTag(this, UltimateAbilityTag);
+	ActionComp->StartActionByTag(UltimateAbilityTag);
 }

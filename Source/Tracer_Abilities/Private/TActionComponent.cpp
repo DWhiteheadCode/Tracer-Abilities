@@ -6,11 +6,6 @@
 #include "TAction.h"
 #include "GameplayTagContainer.h"
 
-UTActionComponent::UTActionComponent()
-{
-
-}
-
 void UTActionComponent::AddAction(TSubclassOf<UTAction> ActionClass)
 {
 	if (!ensure(ActionClass))
@@ -25,13 +20,13 @@ void UTActionComponent::AddAction(TSubclassOf<UTAction> ActionClass)
 	}
 }
 
-bool UTActionComponent::StartActionByTag(AActor* Instigator, FGameplayTag ActionTag)
+bool UTActionComponent::StartActionByTag(FGameplayTag ActionTag)
 {
 	for (UTAction* Action : Actions)
 	{
 		if (Action && Action->IdentifierTag == ActionTag)
 		{
-			if (! Action->CanStart(Instigator))
+			if (! Action->CanStart())
 			{
 				FString FailedMsg = FString::Printf(TEXT("Failed to run: %s"), *ActionTag.ToString());
 				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FailedMsg);
@@ -40,7 +35,7 @@ bool UTActionComponent::StartActionByTag(AActor* Instigator, FGameplayTag Action
 			}
 
 
-			Action->StartAction(Instigator);
+			Action->StartAction();
 			return true;
 		}
 	}
@@ -48,7 +43,7 @@ bool UTActionComponent::StartActionByTag(AActor* Instigator, FGameplayTag Action
 	return false;
 }
 
-bool UTActionComponent::StopActionByTag(AActor* Instigator, FGameplayTag ActionTag)
+bool UTActionComponent::StopActionByTag(FGameplayTag ActionTag)
 {
 	for (UTAction* Action : Actions)
 	{
@@ -56,7 +51,7 @@ bool UTActionComponent::StopActionByTag(AActor* Instigator, FGameplayTag ActionT
 		{
 			if (Action->IsRunning())
 			{
-				Action->StopAction(Instigator);
+				Action->StopAction();
 				return true;
 			}			
 		}

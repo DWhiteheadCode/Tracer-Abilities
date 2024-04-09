@@ -23,7 +23,7 @@ public:
 	float MaxBlinkDistance;
 
 	UFUNCTION()
-	void StartAction_Implementation(AActor* Instigator) override;
+	void StartAction_Implementation() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Blink")
 	FVector GetTeleportDestination(ACharacter* CharacterToTeleport);

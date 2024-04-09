@@ -26,13 +26,13 @@ public:
 	FGameplayTag IdentifierTag;
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
-	bool CanStart(AActor* Instigator);
+	bool CanStart();
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
-	void StartAction(AActor* Instigator);
+	void StartAction();
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
-	void StopAction(AActor* Instigator);
+	void StopAction();
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	bool IsRunning() const;

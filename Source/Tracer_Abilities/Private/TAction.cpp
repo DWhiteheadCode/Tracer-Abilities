@@ -13,9 +13,9 @@ UTAction::UTAction()
 	ActiveDuration = 5;
 }
 
-void UTAction::StartAction_Implementation(AActor* Instigator)
+void UTAction::StartAction_Implementation()
 {
-	if (!ensureAlways(CanStart(Instigator)))
+	if (!ensureAlways(CanStart()))
 	{
 		return;
 	}
@@ -31,12 +31,10 @@ void UTAction::StartAction_Implementation(AActor* Instigator)
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Cooldown, this, &UTAction::OnCooldownEnd, Cooldown, false);
 	
 	// Start active duration
-	FTimerDelegate Delegate;
-	Delegate.BindUFunction(this, "StopAction", Instigator);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_ActiveDuration, Delegate, ActiveDuration, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_ActiveDuration, this, &UTAction::StopAction, ActiveDuration, false);
 }
 
-void UTAction::StopAction_Implementation(AActor* Instigator)
+void UTAction::StopAction_Implementation()
 {
 	if ( ! ensureAlways(bIsRunning))
 	{
@@ -51,7 +49,7 @@ void UTAction::StopAction_Implementation(AActor* Instigator)
 	bIsRunning = false;
 }
 
-bool UTAction::CanStart_Implementation(AActor* Instigator)
+bool UTAction::CanStart_Implementation()
 {
 	if (IsRunning())
 	{

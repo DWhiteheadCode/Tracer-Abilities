@@ -17,16 +17,14 @@ class TRACER_ABILITIES_API UTActionComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	UTActionComponent();
-
 	UFUNCTION(BlueprintCallable, Category = "Actions")
 	void AddAction(TSubclassOf<UTAction> ActionClass);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
-	bool StartActionByTag(AActor* Instigator, FGameplayTag ActionTag);
+	bool StartActionByTag(FGameplayTag ActionTag);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
-	bool StopActionByTag(AActor* Instigator, FGameplayTag ActionTag);
+	bool StopActionByTag(FGameplayTag ActionTag);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Tags")
 	FGameplayTagContainer ActiveGameplayTags;

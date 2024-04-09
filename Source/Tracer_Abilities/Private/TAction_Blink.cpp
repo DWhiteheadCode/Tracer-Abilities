@@ -13,9 +13,9 @@ UTAction_Blink::UTAction_Blink()
 	MaxBlinkDistance = 350;
 }
 
-void UTAction_Blink::StartAction_Implementation(AActor* Instigator)
+void UTAction_Blink::StartAction_Implementation()
 {
-	Super::StartAction_Implementation(Instigator);
+	Super::StartAction_Implementation();
 
 	UTActionComponent* OwningComp = GetOwningComponent();
 	if (!ensure(OwningComp))
@@ -45,8 +45,6 @@ void UTAction_Blink::StartAction_Implementation(AActor* Instigator)
 	}
 
 	OwningCharacter->TeleportTo(Destination, OwningCharacter->GetActorRotation());
-
-	StopAction(Instigator);
 }
 
 FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)

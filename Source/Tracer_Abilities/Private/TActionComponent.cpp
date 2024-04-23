@@ -16,6 +16,7 @@ void UTActionComponent::AddAction(TSubclassOf<UTAction> ActionClass)
 	UTAction* NewAction = NewObject<UTAction>(this, ActionClass);
 	if (ensure(NewAction))
 	{
+		NewAction->BeginPlay();
 		Actions.Add(NewAction);
 	}
 }

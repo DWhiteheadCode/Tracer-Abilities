@@ -37,12 +37,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	bool IsRunning() const;
 
+	virtual void BeginPlay();
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Tags")
 	FGameplayTagContainer GrantsTags;
 
 	UPROPERTY(EditAnywhere, Category = "Tags")
 	FGameplayTagContainer BlockedByTags;
+
+	UPROPERTY(EditAnywhere, Category = "Action")
+	bool bSetAutoEndTimer;
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	UTActionComponent* GetOwningComponent() const;

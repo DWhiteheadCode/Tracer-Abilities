@@ -11,6 +11,7 @@ UTAction::UTAction()
 	bIsOnCooldown = false;
 	Cooldown = 15;
 	ActiveDuration = 5;
+	bSetAutoEndTimer = true;
 }
 
 void UTAction::StartAction_Implementation()
@@ -31,7 +32,10 @@ void UTAction::StartAction_Implementation()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Cooldown, this, &UTAction::OnCooldownEnd, Cooldown, false);
 	
 	// Start active duration
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_ActiveDuration, this, &UTAction::StopAction, ActiveDuration, false);
+	if (bSetAutoEndTimer)
+	{
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_ActiveDuration, this, &UTAction::StopAction, ActiveDuration, false);
+	}	
 }
 
 void UTAction::StopAction_Implementation()
@@ -83,6 +87,10 @@ bool UTAction::CanStart_Implementation()
 bool UTAction::IsRunning() const
 {
 	return bIsRunning;
+}
+
+void UTAction::BeginPlay()
+{
 }
 
 void UTAction::OnCooldownEnd()

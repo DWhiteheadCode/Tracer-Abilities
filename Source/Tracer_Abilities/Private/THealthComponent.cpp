@@ -38,3 +38,16 @@ void UTHealthComponent::ApplyDamage(int Damage)
 	}	
 }
 
+void UTHealthComponent::SetHealth(int NewHealth)
+{
+	int OldHealth = Health;
+	Health = FMath::Clamp(NewHealth, 0, HealthMax);
+
+	float ActualDelta = Health - OldHealth;
+
+	if (ActualDelta != 0)
+	{
+		OnHealthChanged.Broadcast(this, Health, ActualDelta);
+	}
+}
+

@@ -56,7 +56,7 @@ void UTAction_Recall::PushRecallData()
 		{
 			FRecallData RecallData;
 			RecallData.Location = OwningCharacter->GetActorLocation();
-			RecallData.Rotation = OwningCharacter->GetActorRotation();
+			RecallData.Rotation = OwningCharacter->GetControlRotation();
 
 			if (UTHealthComponent* HealthComp = Cast<UTHealthComponent>(
 				OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass())))
@@ -163,7 +163,10 @@ void UTAction_Recall::UpdateActorTransform(FVector SegmentStartPos, FVector Segm
 	FRotator CurrentRot = FMath::Lerp(SegmentStartRot, SegmentEndRot, LerpValue);
 
 	OwningCharacter->SetActorLocation(CurrentPos);
-	OwningCharacter->SetActorRotation(CurrentRot);
+	if (AController* Controller = OwningCharacter->GetController())
+	{
+		Controller->SetControlRotation(CurrentRot);
+	}	
 
 	// End of current segment
 	if (LerpValue >= 1)
@@ -214,7 +217,6 @@ void UTAction_Recall::StopAction_Implementation()
 	}
 
 	//UE_LOG(LogTemp, Log, TEXT("RECALL ENDING"));
-
 
 	if (ensure(OwningCharacter))
 	{

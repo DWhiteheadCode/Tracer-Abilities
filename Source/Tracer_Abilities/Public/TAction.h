@@ -52,6 +52,7 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	UTActionComponent* GetOwningComponent() const;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Action")
 	bool bIsRunning;
 
 	// ACTIVE DURATION ---------------------------------------
@@ -66,9 +67,9 @@ protected:
 	
 	FTimerHandle TimerHandle_Cooldown;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Action")
 	bool bIsOnCooldown;
 
 	UFUNCTION()
-	void OnCooldownEnd();
-	
+	void OnCooldownEnd();	
 };

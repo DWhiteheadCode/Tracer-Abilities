@@ -67,6 +67,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Recall")
 	float TimeToRecall;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Recall")
 	bool bQueueIsMaxSize;
 
 	FTimerHandle TimerHandle_MaxQueueSize;

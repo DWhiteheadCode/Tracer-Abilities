@@ -90,3 +90,8 @@ void ATCharacter::StartUltimateAbility()
 {
 	ActionComp->StartActionByTag(UltimateAbilityTag);
 }
+
+void ATCharacter::HealSelf(float Amount)
+{
+	HealthComp->ApplyHeal(Amount);
+}

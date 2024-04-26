@@ -88,4 +88,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	FGameplayTag UltimateAbilityTag;
 
+	// DEBUG --------------------------------------------------------------
+	UFUNCTION(Exec)
+	void HealSelf(float Amount = 100);
 };

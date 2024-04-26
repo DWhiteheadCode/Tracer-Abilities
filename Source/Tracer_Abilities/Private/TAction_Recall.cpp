@@ -62,7 +62,6 @@ void UTAction_Recall::PushRecallData()
 				OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass())))
 			{
 				RecallData.Health = HealthComp->GetHealth();
-				RecallData.bSavedHealth = true;
 			}
 
 			RecallDataArray.Insert(RecallData, 0);
@@ -226,18 +225,15 @@ void UTAction_Recall::StopAction_Implementation()
 
 		OwningCharacter->SetActorLocation( FinalRecallData.Location );
 
-		if (FinalRecallData.bSavedHealth)
+		UTHealthComponent* HealthComp = Cast<UTHealthComponent>(OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
+		if (HealthComp)
 		{
-			UTHealthComponent* HealthComp = Cast<UTHealthComponent>(OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
-			if (ensure(HealthComp))
+			// Only update health if recalled health is more than current health
+			if ( FinalRecallData.Health > HealthComp->GetHealth() )
 			{
-				// Only update health if recalled health is more than current health
-				if ( FinalRecallData.Health > HealthComp->GetHealth() )
-				{
-					HealthComp->SetHealth(FinalRecallData.Health);
-				}
+				HealthComp->SetHealth(FinalRecallData.Health);
 			}
-		}
+		}		
 
 		OwningCharacter->GetWorld()->GetTimerManager().SetTimer(
 			TimerHandle_MaxQueueSize, this, &UTAction_Recall::OnMaxQueueTimerEnd, TimeToRecall, false);

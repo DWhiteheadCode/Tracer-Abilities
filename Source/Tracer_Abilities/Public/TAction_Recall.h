@@ -20,9 +20,6 @@ public:
 
 	UPROPERTY()
 	int Health;
-
-	UPROPERTY()
-	bool bSavedHealth;
 };
 
 /**

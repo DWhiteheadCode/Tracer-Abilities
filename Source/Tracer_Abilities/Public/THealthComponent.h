@@ -26,6 +26,9 @@ public:
 	void ApplyDamage(int Damage);
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
+	void ApplyHeal(int Amount);
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
 	void SetHealth(int NewHealth);
 
 	UPROPERTY(BlueprintAssignable, Category = "Health")

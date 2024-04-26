@@ -170,7 +170,7 @@ void UTAction_Recall::UpdateActorTransform(FVector SegmentStartPos, FVector Segm
 	{
 		SCOPE_CYCLE_COUNTER(STAT_UpdateActorTransformNewSegment);
 
-		UE_LOG(LogTemp, Log, TEXT("End recall segment. Current time: %f"), CurrentTime);
+		//UE_LOG(LogTemp, Log, TEXT("End recall segment. Current time: %f"), CurrentTime);
 
 		CurrentRecallIndex++;
 

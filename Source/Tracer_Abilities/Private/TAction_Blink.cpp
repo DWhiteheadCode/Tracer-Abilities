@@ -8,6 +8,8 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+static TAutoConsoleVariable<bool> CVarBlinkDebugLines(TEXT("t.BlinkDebug"), false, TEXT("Draw debug dots and capsules for blinks"), ECVF_Cheat);
+
 UTAction_Blink::UTAction_Blink()
 {
 	MaxBlinkDistance = 350;
@@ -66,8 +68,11 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
 
 	FVector EndLocation = StartLocation + (InputDirection * MaxBlinkDistance);
 
-	DrawDebugSphere(GetWorld(), StartLocation, 2, 8, FColor::Green, false, 5.0f);
-	DrawDebugSphere(GetWorld(), EndLocation, 2, 8, FColor::Blue, false, 5.0f);
+	if (CVarBlinkDebugLines.GetValueOnGameThread())
+	{
+		DrawDebugSphere(GetWorld(), StartLocation, 2, 8, FColor::Green, false, 5.0f);
+		DrawDebugSphere(GetWorld(), EndLocation, 2, 8, FColor::Blue, false, 5.0f);
+	}
 
 	FCollisionObjectQueryParams Params;
 	Params.AddObjectTypesToQuery(ECC_WorldStatic);
@@ -84,7 +89,10 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
 
 		if (GetWorld()->SweepSingleByObjectType(HitResult, StartLocation, EndLocation, FQuat::Identity, Params, Shape))
 		{
-			DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 2, 8, FColor::Red, false, 5.0f);
+			if (CVarBlinkDebugLines.GetValueOnGameThread())
+			{
+				DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 2, 8, FColor::Red, false, 5.0f);
+			}			
 
 			FVector ReversedSweepDirection = StartLocation - EndLocation;
 			ReversedSweepDirection.Normalize();
@@ -96,8 +104,11 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
 			DebugCapsuleColor = FColor::Red;
 		}
 
-		DrawDebugCapsule(GetWorld(), EndLocation, CharacterCapsule->GetScaledCapsuleHalfHeight(),
-			CharacterCapsule->GetScaledCapsuleRadius(), FQuat::Identity, DebugCapsuleColor, false, 5.0f);
+		if (CVarBlinkDebugLines.GetValueOnGameThread())
+		{
+			DrawDebugCapsule(GetWorld(), EndLocation, CharacterCapsule->GetScaledCapsuleHalfHeight(),
+				CharacterCapsule->GetScaledCapsuleRadius(), FQuat::Identity, DebugCapsuleColor, false, 5.0f);
+		}		
 	}
 
 	return EndLocation;

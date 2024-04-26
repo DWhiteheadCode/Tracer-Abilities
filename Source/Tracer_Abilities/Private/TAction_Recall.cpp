@@ -137,11 +137,11 @@ void UTAction_Recall::StartAction_Implementation()
 		SegmentDuration
 		);
 	
-	UE_LOG(LogTemp, Log, TEXT("STARTING RECALL:"));
-	UE_LOG(LogTemp, Log, TEXT("\tStart Time: %f"), StartTime);
-	UE_LOG(LogTemp, Log, TEXT("\tNum Segments: %i"), RecallDataArray.Num());
-	UE_LOG(LogTemp, Log, TEXT("\tSegment Duration: %f"), SegmentDuration);
-	UE_LOG(LogTemp, Log, TEXT("\tEstimated End Time: %f"), (StartTime + ActiveDuration));
+	//UE_LOG(LogTemp, Log, TEXT("STARTING RECALL:"));
+	//UE_LOG(LogTemp, Log, TEXT("\tStart Time: %f"), StartTime);
+	//UE_LOG(LogTemp, Log, TEXT("\tNum Segments: %i"), RecallDataArray.Num());
+	//UE_LOG(LogTemp, Log, TEXT("\tSegment Duration: %f"), SegmentDuration);
+	//UE_LOG(LogTemp, Log, TEXT("\tEstimated End Time: %f"), (StartTime + ActiveDuration));
 
 	OwningCharacter->GetWorld()->GetTimerManager().SetTimer(TimerHandle_RecallSegment, Delegate, TransformUpdateInterval, true);
 }
@@ -158,14 +158,6 @@ void UTAction_Recall::UpdateActorTransform(FVector SegmentStartPos, FVector Segm
 
 	float CurrentTime = OwningCharacter->GetWorld()->GetTimeSeconds();
 	float LerpValue = FMath::Clamp( ((CurrentTime - SegmentStartTime) / SegmentDuration), 0.f, 1.f);
-
-	static int Calls = 1;
-
-	if (Calls < 10)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Update transform. Current time: %f"), CurrentTime);
-		Calls++;
-	}
 
 	FVector CurrentPos = FMath::Lerp(SegmentStartPos, SegmentEndPos, LerpValue);
 	FRotator CurrentRot = FMath::Lerp(SegmentStartRot, SegmentEndRot, LerpValue);
@@ -221,12 +213,12 @@ void UTAction_Recall::StopAction_Implementation()
 		return;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("RECALL ENDING"));
+	//UE_LOG(LogTemp, Log, TEXT("RECALL ENDING"));
 
 
 	if (ensure(OwningCharacter))
 	{
-		UE_LOG(LogTemp, Log, TEXT("\tEnd Time: %f"), (OwningCharacter->GetWorld()->GetTimeSeconds()));
+		//UE_LOG(LogTemp, Log, TEXT("\tEnd Time: %f"), (OwningCharacter->GetWorld()->GetTimeSeconds()));
 
 		FRecallData FinalRecallData = RecallDataArray.Pop();
 

@@ -31,38 +31,38 @@ protected:
 
 	// COMPONENTS ---------------------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UCameraComponent* CameraComp;
+	TObjectPtr<UCameraComponent> CameraComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UTActionComponent* ActionComp;
+	TObjectPtr<UTActionComponent> ActionComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UTHealthComponent* HealthComp;
+	TObjectPtr<UTHealthComponent> HealthComp;
 
 	// INPUT --------------------------------------------------------------
 	// IMC
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	UInputMappingContext* DefaultInputMappingContext;
+	TObjectPtr<UInputMappingContext> DefaultInputMappingContext;
 
 	// Move
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	UInputAction* MovementAction;
+	TObjectPtr<UInputAction> MovementAction;
 
 	void Move(const FInputActionValue& Value);
 
 	// Look
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	UInputAction* LookAction;
+	TObjectPtr<UInputAction> LookAction;
 
 	void Look(const FInputActionValue& Value);
 
 	// Jump
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	UInputAction* JumpAction;
+	TObjectPtr<UInputAction> JumpAction;
 	
 	// Primary Ability
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	UInputAction* PrimaryAbilityAction;
+	TObjectPtr<UInputAction> PrimaryAbilityAction;
 
 	UFUNCTION()
 	void StartPrimaryAbility();
@@ -72,7 +72,7 @@ protected:
 
 	// Secondary Ability 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	UInputAction* SecondaryAbilityAction;
+	TObjectPtr<UInputAction> SecondaryAbilityAction;
 
 	void StartSecondaryAbility();
 
@@ -81,7 +81,7 @@ protected:
 
 	// Ultimate Ability
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	UInputAction* UltimateAbilityAction;
+	TObjectPtr<UInputAction> UltimateAbilityAction;
 
 	void StartUltimateAbility();
 

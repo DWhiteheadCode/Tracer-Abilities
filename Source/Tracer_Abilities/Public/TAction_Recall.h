@@ -90,10 +90,10 @@ protected:
 		float SegmentStartTime, float SegmentDuration);
 
 	UPROPERTY(BlueprintReadOnly)
-	UTActionComponent* OwningComp;
+	TObjectPtr<UTActionComponent> OwningComp;
 
 	UPROPERTY(BlueprintReadOnly)
-	ACharacter* OwningCharacter;
+	TObjectPtr<ACharacter> OwningCharacter;
 
 	int CurrentRecallIndex;
 };

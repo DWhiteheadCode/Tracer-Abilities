@@ -33,7 +33,7 @@ public:
 
 protected:
 	UPROPERTY()
-	TArray<UTAction*> Actions;
+	TArray< TObjectPtr<UTAction> > Actions;
 	
 	UPROPERTY(EditAnywhere, Category = "Actions")
 	TArray<TSubclassOf<UTAction>> DefaultActions;

@@ -25,13 +25,13 @@ protected:
 
 	// COMPONENTS ---------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UStaticMeshComponent* MeshComp;
+	TObjectPtr<UStaticMeshComponent> MeshComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	USphereComponent* CollisionSphereComp;
+	TObjectPtr<USphereComponent> CollisionSphereComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UProjectileMovementComponent* ProjectileMovementComp;
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComp;
 
 	// BALANCE ------------------------------------------------
 	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")

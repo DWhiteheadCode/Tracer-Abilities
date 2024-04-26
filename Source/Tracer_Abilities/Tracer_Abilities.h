@@ -4,3 +4,4 @@
 
 #include "CoreMinimal.h"
 
+DECLARE_STATS_GROUP(TEXT("Tracer_Abilities"), STATGROUP_Tracer, STATCAT_Advanced);

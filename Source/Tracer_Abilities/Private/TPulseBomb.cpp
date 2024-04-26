@@ -9,8 +9,13 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "THealthComponent.h"
 
+static TAutoConsoleVariable<bool> CVarPulseBombDebugLines(TEXT("t.PulseBombDebug"), false, TEXT("Draw debug lines for pulse bombs"), ECVF_Cheat);
+
 ATPulseBomb::ATPulseBomb()
 {
+	// Only used for debug cvar- remove if unneeded.
+	PrimaryActorTick.bCanEverTick = true;
+
 	StickRadius = 20;
 	ExplosionDelay = 2;
 	ExplosionRadius = 200;
@@ -44,6 +49,14 @@ void ATPulseBomb::BeginPlay()
 	Super::BeginPlay();
 
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Explosion, this, &ATPulseBomb::Explode, ExplosionDelay, false);
+}
+
+void ATPulseBomb::Tick(float DeltaTime)
+{
+	if (CVarPulseBombDebugLines.GetValueOnGameThread())
+	{
+		DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 16, FColor::Blue, false, 0.0f, 1.0f);
+	}
 }
 
 

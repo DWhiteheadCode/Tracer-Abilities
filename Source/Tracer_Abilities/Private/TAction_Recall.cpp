@@ -179,7 +179,7 @@ void UTAction_Recall::UpdateActorTransform(FVector SegmentStartPos, FVector Segm
 
 		CurrentRecallIndex++;
 
-		// The last in the array segment has just finished
+		// The last segment has just finished (i.e. the character is at the final location/rotation from this recall)
 		if (!RecallDataArray.IsValidIndex(CurrentRecallIndex))
 		{
 			CurrentRecallIndex = -1;

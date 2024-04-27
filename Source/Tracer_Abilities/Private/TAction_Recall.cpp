@@ -221,18 +221,16 @@ void UTAction_Recall::StopAction_Implementation()
 	{
 		//UE_LOG(LogTemp, Log, TEXT("\tEnd Time: %f"), (OwningCharacter->GetWorld()->GetTimeSeconds()));
 
-		FRecallData FinalRecallData = RecallDataArray.Pop();
-
-		OwningCharacter->SetActorLocation( FinalRecallData.Location );
-
 		UTHealthComponent* HealthComp = Cast<UTHealthComponent>(OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
 		if (HealthComp)
 		{
+			FRecallData FinalRecallData = RecallDataArray.Pop();
 			// Only update health if recalled health is more than current health
 			if ( FinalRecallData.Health > HealthComp->GetHealth() )
 			{
 				HealthComp->SetHealth(FinalRecallData.Health);
 			}
+			// Don't need to set the location or rotation as the UpdateActorTransform() function already did that
 		}		
 
 		OwningCharacter->GetWorld()->GetTimerManager().SetTimer(

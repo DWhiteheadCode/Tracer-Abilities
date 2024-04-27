@@ -17,6 +17,8 @@ class TRACER_ABILITIES_API UTAction_PulseBomb : public UTAction
 	GENERATED_BODY()
 	
 public:
+	UTAction_PulseBomb();
+	
 	void StartAction_Implementation() override;
 
 protected:

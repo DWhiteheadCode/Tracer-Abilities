@@ -5,6 +5,12 @@
 
 #include "TActionComponent.h"
 
+UTAction_PulseBomb::UTAction_PulseBomb()
+{
+	ActiveDuration = 0.5f;
+	Cooldown = 15.f;
+}
+
 void UTAction_PulseBomb::StartAction_Implementation()
 {
 	Super::StartAction_Implementation();

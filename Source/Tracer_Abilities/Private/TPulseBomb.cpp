@@ -13,9 +13,6 @@ static TAutoConsoleVariable<bool> CVarPulseBombDebugLines(TEXT("t.PulseBombDebug
 
 ATPulseBomb::ATPulseBomb()
 {
-	// Only used for debug cvar- remove if unneeded.
-	PrimaryActorTick.bCanEverTick = true;
-
 	StickRadius = 20;
 	ExplosionDelay = 2;
 	ExplosionRadius = 200;
@@ -51,14 +48,6 @@ void ATPulseBomb::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Explosion, this, &ATPulseBomb::Explode, ExplosionDelay, false);
 }
 
-void ATPulseBomb::Tick(float DeltaTime)
-{
-	if (CVarPulseBombDebugLines.GetValueOnGameThread())
-	{
-		DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 16, FColor::Blue, false, 0.0f, 1.0f);
-	}
-}
-
 
 void ATPulseBomb::Explode()
 {
@@ -72,6 +61,11 @@ void ATPulseBomb::Explode()
 	TArray<AActor*> NearbyActors;
 
 	UKismetSystemLibrary::SphereOverlapActors(this, GetActorLocation(), ExplosionRadius, ObjectTypes, nullptr, ActorsToIgnore, NearbyActors);
+
+	if (CVarPulseBombDebugLines.GetValueOnGameThread())
+	{
+		DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 16, FColor::Red, false, 3.0f, 2, 1.0f);
+	}
 
 	for (AActor* NearbyActor : NearbyActors)
 	{
@@ -110,11 +104,10 @@ int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 		return 0;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Distance to bomb: %f"), Distance);
-
 	// Deal MaxDamage at 0 distance, scaling linearly down to MinDamage if Distance == ExplosionRadius
 	int Damage = FMath::Lerp(MaxDamage, MinDamage, (Distance / ExplosionRadius));
 
+	UE_LOG(LogTemp, Log, TEXT("Distance to bomb: %f"), Distance);
 	UE_LOG(LogTemp, Log, TEXT("Damage from bomb: %i"), Damage);
 
 	return Damage;
@@ -127,8 +120,6 @@ void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		return;
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("PULSE BOMB OVERLAPPED"));
 
 	// Only stick to first actor it overlaps with
 	CollisionSphereComp->SetGenerateOverlapEvents(false);
@@ -144,11 +135,20 @@ void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 	APawn* OtherPawn = Cast<APawn>(OtherActor);
 
+	FColor DebugColor = FColor::Blue;
+
 	if (OtherPawn)
 	{
 		MeshComp->SetVisibility(false);
 
 		FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
 		AttachToActor(OtherPawn, TransformRules);
+
+		DebugColor = FColor::Yellow;
 	}	
+
+	if (CVarPulseBombDebugLines.GetValueOnGameThread())
+	{
+		DrawDebugSphere(GetWorld(), GetActorLocation(), 5.0f, 16, DebugColor, false, 3.0f, 2, 1.0f);
+	}
 }

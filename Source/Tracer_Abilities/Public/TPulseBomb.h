@@ -21,8 +21,6 @@ public:
 protected:
 	void BeginPlay() override;
 
-	void Tick(float DeltaTime) override;
-
 	void PostInitializeComponents() override;
 
 	// COMPONENTS ---------------------------------------------

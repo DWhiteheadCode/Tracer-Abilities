@@ -1,23 +1,23 @@
 # Introduction
-This repository contains my recreation of Tracer's abilities from Overwatch (2), (by Blizzard Entertainment). This project was created strictly for educational purposes as I learn Unreal Engine 5. 
+This repository contains my recreation of Tracer's abilities from Overwatch (2), (by Blizzard Entertainment). This project was created strictly for educational purposes while I learn Unreal Engine 5. 
 
 ***THIS IS A WORK IN PROGRESS!*** I still have plans for things to add/ improve, such as adding UI elements showing cooldowns, allowing multiple charges of abilities, etc. 
 
 Included is a basic gameplay framework for starting/ stopping actions, modifying a character's health, among other things. Most importantly, implementations of the abilities "blink", "recall", and "pulse bomb" are included. More details on these are provided below.
 
-This project was intended purely to showcase my implementations of these abilities. As such, most elements of the "game" are very basic or not implemented. For example, there is no real game mode or player death, so health simply gets capped at 0. There is also a very basic "Test Dummy" that is useful for showcasing the pulse bomb's "stick" mechanic. 
+This project was intended purely to showcase my implementations of these abilities. As such, most elements of the "game" are very basic or not implemented. For example, there is no real game mode or player death, so health simply gets capped at 0. These areas may or may not get fleshed out more in the future.
 
 # Blink
 ## Description
-Blink allows the player to teleport a short distance in the direction of their movement input. The player can teleport through other players, but terrain (such as walls) blocks the move- placing the player up against the terrain after the teleport.
+Blink allows the player to teleport a short distance in the direction of their most recent movement input. The player can teleport through other players, but terrain (such as walls) blocks the move- placing the player up against the terrain after the teleport.
 
 Blink is bound to `Left Shift` and `Right Click` (i.e. either key can be used).
 
 ## Implementation
 My implementation starts by sweeping a capsule (of the same dimensions as the player's character) in the direction of the player's last movement input. 
 - If no movement input is provided (i.e. blink is the only key being pressed), the character's forward vector is used.
-- If this sweep does **not** result in a hit (with a `WorldStatic` or `WorldDynamic` object), the player will be teleported by the maximum `MaxBlinkDistance` in the direction of their input. 
-- If the sweep does result in a hit, the `HitResult.ImpactPoint` is taken as a starting point. From here, the player's capsule's radius is added in the opposite direction of the sweep (i.e., from the impact point to the player's starting location). The result of this is used as the destination to teleport the player to. This is done to ensure the player is teleported up against the wall, rather than relying on UE5's `AActor::TeleportTo(...)` to resolve the collision.
+- If this sweep does **not** result in a hit (with a `WorldStatic` or `WorldDynamic` object), the player will be teleported by the `MaxBlinkDistance` in the direction of their input. 
+- If the sweep does result in a hit, the `HitResult.ImpactPoint` is taken as a starting point. From here, the player's capsule's radius is added in the opposite direction of the sweep (i.e., from the impact point to the player's starting location). The result of this is used as the destination to teleport the player to. This is done to ensure the player is teleported up against the wall, rather than relying on UE5's `AActor::TeleportTo(...)` to resolve the collision, which can result in the teleport failing.
 - The player's **horizontal** speed is also preserved across the blink.
 	- I.e. if the player is moving at 500 ups (units per second) to their left, then they immediately press right and blink, they will be teleported to the right, and will be moving at 500 ups to their right.
 
@@ -26,7 +26,7 @@ My implementation starts by sweeping a capsule (of the same dimensions as the pl
 Recall is the most complicated of the abilities. It rewinds the player to their location a certain number of seconds ago (by default, 3 seconds). This rewind process takes an amount of time, during which:
 - The user is both invisible and has no collision
 - The user can't perform any other inputs
-- The user is shown a rough rewind through where they were/ where they were looking during the time that is being rewound (i.e. the 3 seconds before the ability was used)
+- The user is shown a rough rewind animation through where they were/ where they were looking during the time that is being rewound (i.e. the 3 seconds before the ability was used)
 
 At the end of the ability, the player's health is set to its maximum value from any point in time during the duration that was rewound. 
 
@@ -37,7 +37,7 @@ I created an `FRecallData` struct that stores the data for any given point in ti
 
 A `TArray<FRecallData>` is used to store the recall data for the entire duration that can be rewound. This array is treated somewhat like a queue, where elements at the front (lower index) are the most recent entries, while elements at the back (higher index) are the oldest entries.
 
-When the ability is initialised, a looping timer (called the `PushRecallData` timer) is started that frequently pushes a new entry into the array, using the character's current location/ rotation/ health. On initialisation, a second, non-looping, timer is started (called the `MaxQueueSize` timer) that lasts for the maximum recall length (i.e. the amount of time that will be rewound, not the amount of time that it takes for the rewind to complete). When this timer ends, a flag is set that will cause the oldest entry to be popped off the array each time a new entry is about to be pushed into it. This ensures that the array only holds data from the relevant time period. 
+When the ability is initialised, a looping timer (called the `PushRecallData` timer) is started that frequently pushes a new entry into the array, using the character's current location/ rotation/ health. On initialisation, a second, non-looping, timer is started (called the `MaxQueueSize` timer) that lasts for the maximum recall length (i.e. the amount of time that will be rewound, not the amount of time that it takes for the rewind to complete). When this timer ends, a boolean flag is set that will cause the oldest entry to be popped off the array each time a new entry is about to be pushed into the array. This ensures that the array only holds data from the relevant time period. 
 
 When the ability is started, the following things happen:
 - The player's character is set to be invisible, and their collision is disabled
@@ -63,14 +63,16 @@ When the action ends, the following events occur:
 - The `PushRecallData` and `MaxQueueSize` timers are started again
 - The recall data array is emptied
 - The flag is reset to indicate that entries should not be popped off the array (until the `MaxQueueSize` timer ends again)
+- The player's character is set to be visible again, and their collision is re-enabled
+- The player's controller input is re-enabled
 - A data entry is immediately pushed into the array
 	- This prevents any issues that would occur if the cooldown were lower than the rate at which new entries are pushed into the queue, causing a potentially empty array
 
 # Pulse Bomb
 ## Description
-The player can throw a pulse bomb. This bomb explodes after a short period of time, dealing damage in a radius around it. The closer the bomb is to a target, the more damage it will deal.
+The player can throw a pulse bomb. This bomb explodes after a short period of time, dealing damage in a radius around it. The closer the bomb is to a target, the more damage it will deal to that target.
 
-The bomb can stick to surfaces and players (once a bomb is stuck to an object/player, that bomb can't be un-stuck, or stick to anything else). When a bomb sticks to a player, it turns invisible.
+The bomb can stick to surfaces and players. Once a bomb is stuck to an object/player, that bomb can't be un-stuck, or stick to anything else. When a bomb sticks to a player, it turns invisible.
 
 Pulse Bomb is bound to `Q`
 
@@ -90,14 +92,14 @@ The projectile also contains a sphere component. This is used to detect collisio
 - The projectile's velocity is set to 0
 - The projectile's gravity is set to 0
 
-If the actor that caused the overlap is a `APawn`:
+If the actor that caused the overlap is an `APawn`:
 - The bomb is set to be invisible
 - The bomb is attached to that pawn
 
 **Note:**
-- This implementation assumes `WorldStatic` and `WorldDynamic` object don't move
-- This implementation assumes the stuck `APawn` won't de-spawn or die
-	- If this was later implemented, some handling would likely need to be done to drop the bomb in place
+- This implementation assumes `WorldStatic` and `WorldDynamic` objects don't move
+- This implementation assumes that the stuck `APawn` won't de-spawn or die
+	- If death is later implemented, some handling would likely need to be done to drop the bomb in place, and re-enable the ability for it to stick to a new actor.
 
 ### Action/ Ability
 The pulse bomb action is relatively straight forward. It simply spawns the projectile at the location of, and with the same rotation as, the user's `GetActorEyesViewPoint(...)`. The user's pawn is marked as the projectile's `Instigator`, though this is not really used for anything at this point in time.
@@ -106,7 +108,7 @@ The pulse bomb action is relatively straight forward. It simply spawns the proje
 Some basic debugging functionality has been included to assist with development/ to showcase functionality.
 
 ## Blink Debug CVar
-The blink ability contains a boolean cvar that can be toggled with `t.BlinkDebug true`/ `t.BlinkDebug false` in the in game console. 
+The blink ability contains a boolean cvar that can be toggled with `t.BlinkDebug true`/ `t.BlinkDebug false` in the in-game console. 
 
 If set to true, the following debug shapes will be draw when the ability is used:
 - A green sphere at the blink's start location
@@ -117,7 +119,7 @@ If set to true, the following debug shapes will be draw when the ability is used
 	- It will be red if the sweep resulted in a hit, and white otherwise
 
 ## Pulse Bomb Debug CVar
-The pulse bomb projectile contains a boolean cvar that can be toggled with `t.PulseBombDebug true`/ `t.PulseBombDebug false` in the in game console. 
+The pulse bomb projectile contains a boolean cvar that can be toggled with `t.PulseBombDebug true`/ `t.PulseBombDebug false` in the in-game console. 
 
 If set to true, the following will occur:
 - When the bomb explodes, a red sphere will be shown at the location of the bomb, with a radius matching that of the explosion
@@ -125,7 +127,7 @@ If set to true, the following will occur:
 	- It will be yellow if the actor it overlapped with was a pawn, and blue otherwise
 
 ## `HealSelf` Command
-The playable character has access to a console command that can be accessed by typing `HealSelf`, or `HealSelf x`, where `x` is the amount you want to heal your character by (e.g. `HealSelf 10`). If no value is provided, the default of 100 will be used.
+The playable character has access to a console command that can be accessed by typing `HealSelf`, or `HealSelf x`, where `x` is the amount you want to heal your character by (e.g. `HealSelf 10`), in the in-game console. If no value is provided, the default of 100 will be used.
 
 As the name suggests, this command is used to heal your character. If a non-positive value is entered, this command will have no effect. This command can only be used to heal up to your character's (or more specifically, your character's health component's) `HealthMax` and no higher. 
 

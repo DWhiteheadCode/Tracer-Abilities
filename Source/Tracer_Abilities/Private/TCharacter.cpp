@@ -93,5 +93,8 @@ void ATCharacter::StartUltimateAbility()
 
 void ATCharacter::HealSelf(float Amount)
 {
-	HealthComp->ApplyHeal(Amount);
+	if (Amount > 0)
+	{
+		HealthComp->ApplyHeal(Amount);
+	}	
 }

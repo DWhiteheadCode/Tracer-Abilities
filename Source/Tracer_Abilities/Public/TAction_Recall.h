@@ -94,4 +94,6 @@ protected:
 	TObjectPtr<ACharacter> OwningCharacter;
 
 	int CurrentRecallIndex;
+
+	int MaxRecalledHealth;
 };

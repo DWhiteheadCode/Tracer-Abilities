@@ -21,6 +21,7 @@ UTAction_Recall::UTAction_Recall()
 	bQueueIsMaxSize = false;
 	CurrentRecallIndex = -1;
 	bSetAutoEndTimer = false; // Recall manually handles ending of action
+	MaxRecalledHealth = 0;
 }
 
 void UTAction_Recall::BeginPlay()
@@ -126,6 +127,8 @@ void UTAction_Recall::StartAction_Implementation()
 	FVector SegmentEndLocation = RecallDataArray[0].Location;
 	FRotator SegmentEndRotation = RecallDataArray[0].Rotation;
 
+	MaxRecalledHealth = RecallDataArray[0].Health;
+
 	FTimerDelegate Delegate;
 	Delegate.BindUFunction(this, "UpdateActorTransform",
 		OwningCharacter->GetActorLocation(),
@@ -186,7 +189,9 @@ void UTAction_Recall::UpdateActorTransform(FVector SegmentStartPos, FVector Segm
 
 			return;
 		}
-
+				
+		MaxRecalledHealth = FMath::Max(MaxRecalledHealth, RecallDataArray[CurrentRecallIndex].Health);
+		
 		FVector NextSegmentStartPos = SegmentEndPos;
 		FVector NextSegmentEndPos = RecallDataArray[CurrentRecallIndex].Location;
 
@@ -223,14 +228,11 @@ void UTAction_Recall::StopAction_Implementation()
 
 		UTHealthComponent* HealthComp = Cast<UTHealthComponent>(OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
 		if (HealthComp)
-		{
-			FRecallData FinalRecallData = RecallDataArray.Pop();
-			// Only update health if recalled health is more than current health
-			if ( FinalRecallData.Health > HealthComp->GetHealth() )
+		{		
+			if (MaxRecalledHealth > HealthComp->GetHealth())
 			{
-				HealthComp->SetHealth(FinalRecallData.Health);
-			}
-			// Don't need to set the location or rotation as the UpdateActorTransform() function already did that
+				HealthComp->SetHealth(MaxRecalledHealth);
+			}			
 		}		
 
 		OwningCharacter->GetWorld()->GetTimerManager().SetTimer(

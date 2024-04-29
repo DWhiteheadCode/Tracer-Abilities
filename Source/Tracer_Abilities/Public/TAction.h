@@ -22,6 +22,8 @@ class TRACER_ABILITIES_API UTAction : public UObject
 public:
 	UTAction();
 
+	virtual void BeginPlay();
+
 	UPROPERTY(EditAnywhere, Category = "Action")
 	FGameplayTag IdentifierTag;
 
@@ -37,7 +39,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	bool IsRunning() const;
 
-	virtual void BeginPlay();
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	int GetMaxCharges() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	int GetCurrentCharges() const;
+
+	
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Tags")
@@ -67,9 +75,13 @@ protected:
 	
 	FTimerHandle TimerHandle_Cooldown;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Action")
-	bool bIsOnCooldown;
-
 	UFUNCTION()
 	void OnCooldownEnd();	
+
+	// CHARGES -----------------------------------------------
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
+	int MaxCharges;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Action")
+	int CurrentCharges;
 };

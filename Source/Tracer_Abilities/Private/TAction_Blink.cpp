@@ -13,7 +13,9 @@ static TAutoConsoleVariable<bool> CVarBlinkDebugLines(TEXT("t.BlinkDebug"), fals
 UTAction_Blink::UTAction_Blink()
 {
 	ActiveDuration = 0.1;
-	Cooldown = 0.1;
+	Cooldown = 10;
+	MaxCharges = 3;
+	CurrentCharges = 3;
 
 	MaxBlinkDistance = 350;
 }

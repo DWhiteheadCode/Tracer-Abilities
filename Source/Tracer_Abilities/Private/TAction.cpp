@@ -8,10 +8,16 @@
 UTAction::UTAction()
 {
 	bIsRunning = false;
-	bIsOnCooldown = false;
 	Cooldown = 15;
 	ActiveDuration = 5;
 	bSetAutoEndTimer = true;
+	MaxCharges = 1;
+	CurrentCharges = 1;
+}
+
+void UTAction::BeginPlay()
+{
+	// Overridden by derived classes
 }
 
 void UTAction::StartAction_Implementation()
@@ -25,11 +31,15 @@ void UTAction::StartAction_Implementation()
 
 	UTActionComponent* ActionComp = GetOwningComponent();
 	ActionComp->ActiveGameplayTags.AppendTags(GrantsTags);
-	bIsRunning = true;
+	bIsRunning = true;	
 	
-	// Start cooldown
-	bIsOnCooldown = true;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Cooldown, this, &UTAction::OnCooldownEnd, Cooldown, false);
+	CurrentCharges--;
+
+	// Don't reset a cooldown if it is already active. 
+	if ( ! GetWorld()->GetTimerManager().IsTimerActive(TimerHandle_Cooldown))
+	{
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Cooldown, this, &UTAction::OnCooldownEnd, Cooldown, false);
+	}	
 	
 	// Start active duration
 	if (bSetAutoEndTimer)
@@ -61,9 +71,9 @@ bool UTAction::CanStart_Implementation()
 		return false;
 	}
 
-	if (bIsOnCooldown)
+	if (CurrentCharges <= 0)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Action [%s] can't start: On Cooldown"), *GetNameSafe(this));
+		UE_LOG(LogTemp, Log, TEXT("Action [%s] can't start: No Charges"), *GetNameSafe(this));
 		return false;
 	}
 
@@ -89,14 +99,26 @@ bool UTAction::IsRunning() const
 	return bIsRunning;
 }
 
-void UTAction::BeginPlay()
+int UTAction::GetMaxCharges() const
 {
+	return MaxCharges;
+}
+
+int UTAction::GetCurrentCharges() const
+{
+	return CurrentCharges;
 }
 
 void UTAction::OnCooldownEnd()
 {
 	UE_LOG(LogTemp, Log, TEXT("Action cooldown ended: %s"), *GetNameSafe(this));
-	bIsOnCooldown = false;
+	CurrentCharges = FMath::Min( (CurrentCharges + 1), MaxCharges );
+
+	// Start another cooldown if more charges could be stored
+	if (CurrentCharges < MaxCharges)
+	{
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Cooldown, this, &UTAction::OnCooldownEnd, Cooldown, false);
+	}
 }
 
 UTActionComponent* UTAction::GetOwningComponent() const

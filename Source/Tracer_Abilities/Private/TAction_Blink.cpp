@@ -66,6 +66,7 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
 
 	FVector StartLocation = CharacterToTeleport->GetActorLocation();
 	FVector InputDirection = CharacterToTeleport->GetLastMovementInputVector();
+	InputDirection.Normalize();
 
 	if (InputDirection == FVector::Zero())
 	{

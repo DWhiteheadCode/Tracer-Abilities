@@ -39,6 +39,8 @@ public:
 
 	void BeginPlay() override;
 
+	FText GetNameText_Implementation() const override;
+
 
 protected:
 	// Contains data from points in time that the recall *could* take the owner back to (or through)

@@ -38,3 +38,8 @@ void UTAction_PulseBomb::StartAction_Implementation()
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 }
+
+FText UTAction_PulseBomb::GetNameText_Implementation() const
+{
+	return NSLOCTEXT("Actions", "PulseBomb_Name", "Pulse Bomb");
+}

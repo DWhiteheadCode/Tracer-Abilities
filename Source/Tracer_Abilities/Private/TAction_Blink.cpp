@@ -119,4 +119,7 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
 	return EndLocation;
 }
 
-
+FText UTAction_Blink::GetNameText_Implementation() const
+{
+	return NSLOCTEXT("Actions", "Blink_Name", "Blink");
+}

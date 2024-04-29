@@ -27,4 +27,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Blink")
 	FVector GetTeleportDestination(ACharacter* CharacterToTeleport);
+
+	FText GetNameText_Implementation() const override;
 };

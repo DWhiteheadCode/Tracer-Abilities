@@ -109,6 +109,11 @@ int UTAction::GetCurrentCharges() const
 	return CurrentCharges;
 }
 
+FText UTAction::GetNameText_Implementation() const
+{
+	return FText::GetEmpty();
+}
+
 void UTAction::OnCooldownEnd()
 {
 	UE_LOG(LogTemp, Log, TEXT("Action cooldown ended: %s"), *GetNameSafe(this));

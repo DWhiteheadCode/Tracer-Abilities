@@ -44,6 +44,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	int GetCurrentCharges() const;
+		
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Action")
+	FText GetNameText() const;
 
 	
 

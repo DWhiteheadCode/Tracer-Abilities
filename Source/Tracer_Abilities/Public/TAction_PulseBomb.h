@@ -21,6 +21,8 @@ public:
 	
 	void StartAction_Implementation() override;
 
+	FText GetNameText_Implementation() const override;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
 	TSubclassOf<AActor> ProjectileClass;

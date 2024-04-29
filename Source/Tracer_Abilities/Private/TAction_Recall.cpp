@@ -44,6 +44,8 @@ void UTAction_Recall::BeginPlay()
 }
 
 
+
+
 void UTAction_Recall::PushRecallData()
 {
 	if (bQueueIsMaxSize)
@@ -96,8 +98,6 @@ void UTAction_Recall::OnActiveStateChanged()
 		}
 	}
 }
-
-
 
 void UTAction_Recall::StartAction_Implementation()
 {
@@ -256,4 +256,9 @@ void UTAction_Recall::StopAction_Implementation()
 void UTAction_Recall::OnMaxQueueTimerEnd()
 {
 	bQueueIsMaxSize = true;
+}
+
+FText UTAction_Recall::GetNameText_Implementation() const
+{
+	return NSLOCTEXT("Actions", "Recall_Name", "Recall");
 }

@@ -8,16 +8,24 @@
 UTAction::UTAction()
 {
 	bIsRunning = false;
+	bSetAutoEndTimer = true;
+
 	Cooldown = 15;
 	ActiveDuration = 5;
-	bSetAutoEndTimer = true;
+		
 	MaxCharges = 1;
+	StartingCharges = 1;
 	CurrentCharges = 1;
 }
 
 void UTAction::BeginPlay()
 {
-	// Overridden by derived classes
+	CurrentCharges = StartingCharges;
+
+	if (CurrentCharges < MaxCharges)
+	{
+		StartCooldown();
+	}
 }
 
 void UTAction::StartAction_Implementation()
@@ -38,11 +46,9 @@ void UTAction::StartAction_Implementation()
 	// Don't reset a cooldown if it is already active. 
 	if ( ! GetWorld()->GetTimerManager().IsTimerActive(TimerHandle_Cooldown))
 	{
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Cooldown, this, &UTAction::OnCooldownEnd, Cooldown, false);
-		OnCooldownStarted.Broadcast(CurrentCharges);
+		StartCooldown();
 	}	
 	
-	// Start active duration
 	if (bSetAutoEndTimer)
 	{
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_ActiveDuration, this, &UTAction::StopAction, ActiveDuration, false);
@@ -117,6 +123,12 @@ FText UTAction::GetNameText_Implementation() const
 	return FText::GetEmpty();
 }
 
+void UTAction::StartCooldown()
+{
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Cooldown, this, &UTAction::OnCooldownEnd, Cooldown, false);
+	OnCooldownStarted.Broadcast(Cooldown);
+}
+
 void UTAction::OnCooldownEnd()
 {
 	UE_LOG(LogTemp, Log, TEXT("Action cooldown ended: %s"), *GetNameSafe(this));
@@ -125,11 +137,22 @@ void UTAction::OnCooldownEnd()
 	// Start another cooldown if more charges could be stored
 	if (CurrentCharges < MaxCharges)
 	{
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Cooldown, this, &UTAction::OnCooldownEnd, Cooldown, false);
-		OnCooldownStarted.Broadcast(CurrentCharges);
+		StartCooldown();
 	}
 
 	OnCooldownEnded.Broadcast(CurrentCharges);
+}
+
+float UTAction::GetRemainingCooldown() const
+{
+	FTimerManager& Manager = GetWorld()->GetTimerManager();
+
+	if (Manager.IsTimerActive(TimerHandle_Cooldown))
+	{
+		return Manager.GetTimerRemaining(TimerHandle_Cooldown);
+	}
+
+	return 0.0f;
 }
 
 UTActionComponent* UTAction::GetOwningComponent() const

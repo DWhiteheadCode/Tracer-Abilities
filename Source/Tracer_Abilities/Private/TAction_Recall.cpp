@@ -26,6 +26,8 @@ UTAction_Recall::UTAction_Recall()
 
 void UTAction_Recall::BeginPlay()
 {
+	Super::BeginPlay();
+
 	OwningComp = GetOwningComponent();
 	if (ensure(OwningComp))
 	{

@@ -9,6 +9,7 @@ UTAction_PulseBomb::UTAction_PulseBomb()
 {
 	ActiveDuration = 0.5f;
 	Cooldown = 20.f;
+	StartingCharges = 0;
 }
 
 void UTAction_PulseBomb::StartAction_Implementation()

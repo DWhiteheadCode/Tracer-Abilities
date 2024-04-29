@@ -9,7 +9,8 @@
 
 #include "TAction.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStateChanged, int, RemainingCharges);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChargesChanged, int, RemainingCharges);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCooldownStarted, float, RemainingDuration);
 
 class UTActionComponent;
 
@@ -51,13 +52,13 @@ public:
 	FText GetNameText() const;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnStateChanged OnActionStarted;
+	FOnChargesChanged OnActionStarted;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnStateChanged OnCooldownStarted; // Different to OnActionStarted due to multiple charges
+	FOnCooldownStarted OnCooldownStarted; 
 
 	UPROPERTY(BlueprintAssignable)
-	FOnStateChanged OnCooldownEnded;
+	FOnChargesChanged OnCooldownEnded;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Tags")
@@ -87,12 +88,20 @@ protected:
 	
 	FTimerHandle TimerHandle_Cooldown;
 
+	void StartCooldown();
+
 	UFUNCTION()
-	void OnCooldownEnd();	
+	void OnCooldownEnd();
+
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	float GetRemainingCooldown() const;
 
 	// CHARGES -----------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
 	int MaxCharges;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
+	int StartingCharges;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Action")
 	int CurrentCharges;

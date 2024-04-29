@@ -11,6 +11,8 @@ This project was intended purely to showcase my implementations of these abiliti
 ## Description
 Blink allows the player to teleport a short distance in the direction of their most recent movement input. The player can teleport through other players, but terrain (such as walls) blocks the move- placing the player up against the terrain after the teleport.
 
+Blink has 3 charges, each with a 10 second cooldown. If multiple charges have been consumed, one charge will be restored every 10 seconds.
+
 Blink is bound to `Left Shift` and `Right Click` (i.e. either key can be used).
 
 ## Implementation
@@ -29,6 +31,8 @@ Recall is the most complicated of the abilities. It rewinds the player to their 
 - The user is shown a rough rewind animation through where they were/ where they were looking during the time that is being rewound (i.e. the 3 seconds before the ability was used)
 
 At the end of the ability, the player's health is set to its maximum value from any point in time during the duration that was rewound. 
+
+Recall has 1 charge on a 15 second cooldown.
 
 Recall is bound to `E`.
 
@@ -73,6 +77,8 @@ When the action ends, the following events occur:
 The player can throw a pulse bomb. This bomb explodes after a short period of time, dealing damage in a radius around it. The closer the bomb is to a target, the more damage it will deal to that target.
 
 The bomb can stick to surfaces and players. Once a bomb is stuck to an object/player, that bomb can't be un-stuck, or stick to anything else. When a bomb sticks to a player, it turns invisible.
+
+Pulse Bomb has 1 charge on a 20 second cooldown. 
 
 Pulse Bomb is bound to `Q`
 

@@ -9,6 +9,8 @@
 
 #include "TActionComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActionAdded, UTAction*, ChangedAction);
+
 class UTAction;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -31,8 +33,11 @@ public:
 
 	void BeginPlay() override;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnActionAdded OnActionAdded;
+
 protected:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TArray< TObjectPtr<UTAction> > Actions;
 	
 	UPROPERTY(EditAnywhere, Category = "Actions")

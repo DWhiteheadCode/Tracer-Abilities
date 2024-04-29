@@ -39,6 +39,7 @@ void UTAction::StartAction_Implementation()
 	if ( ! GetWorld()->GetTimerManager().IsTimerActive(TimerHandle_Cooldown))
 	{
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Cooldown, this, &UTAction::OnCooldownEnd, Cooldown, false);
+		OnCooldownStarted.Broadcast(CurrentCharges);
 	}	
 	
 	// Start active duration
@@ -46,6 +47,8 @@ void UTAction::StartAction_Implementation()
 	{
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_ActiveDuration, this, &UTAction::StopAction, ActiveDuration, false);
 	}	
+
+	OnActionStarted.Broadcast(CurrentCharges);
 }
 
 void UTAction::StopAction_Implementation()
@@ -123,7 +126,10 @@ void UTAction::OnCooldownEnd()
 	if (CurrentCharges < MaxCharges)
 	{
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Cooldown, this, &UTAction::OnCooldownEnd, Cooldown, false);
+		OnCooldownStarted.Broadcast(CurrentCharges);
 	}
+
+	OnCooldownEnded.Broadcast(CurrentCharges);
 }
 
 UTActionComponent* UTAction::GetOwningComponent() const

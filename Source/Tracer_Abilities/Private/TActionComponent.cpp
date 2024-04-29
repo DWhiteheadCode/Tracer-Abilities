@@ -18,6 +18,7 @@ void UTActionComponent::AddAction(TSubclassOf<UTAction> ActionClass)
 	{
 		NewAction->BeginPlay();
 		Actions.Add(NewAction);
+		OnActionAdded.Broadcast(NewAction);
 	}
 }
 

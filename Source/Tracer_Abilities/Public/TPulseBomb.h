@@ -33,13 +33,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComp;
 
-	// BALANCE ------------------------------------------------
-	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
-	float Gravity;
-
-	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
-	float Speed;
-		
+	// BALANCE ------------------------------------------------	
 	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
 	float StickRadius;
 	

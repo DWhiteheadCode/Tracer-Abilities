@@ -78,8 +78,11 @@ void ATPulseBomb::Explode()
 			if (UTHealthComponent* HealthComp = Cast<UTHealthComponent>(NearbyActor->GetComponentByClass(UTHealthComponent::StaticClass())))
 			{
 				float Damage = CalculateDamage(NearbyActor);
-						
-				HealthComp->ApplyDamage(Damage);
+					
+				if (Damage > 0)
+				{
+					HealthComp->ApplyDamage(Damage);
+				}				
 			}
 		}
 	}

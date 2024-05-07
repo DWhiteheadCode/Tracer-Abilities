@@ -15,9 +15,12 @@ ATPulseBomb::ATPulseBomb()
 {
 	StickRadius = 20;
 	ExplosionDelay = 2;
-	ExplosionRadius = 200;
+	
 	MinDamage = 5;
 	MaxDamage = 100;
+
+	MinDamage_Range = 300;
+	MaxDamage_Range = 50;
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
 	MeshComp->SetCollisionProfileName("NoCollision");
@@ -60,11 +63,12 @@ void ATPulseBomb::Explode()
 
 	TArray<AActor*> NearbyActors;
 
-	UKismetSystemLibrary::SphereOverlapActors(this, GetActorLocation(), ExplosionRadius, ObjectTypes, nullptr, ActorsToIgnore, NearbyActors);
+	UKismetSystemLibrary::SphereOverlapActors(this, GetActorLocation(), MinDamage_Range, ObjectTypes, nullptr, ActorsToIgnore, NearbyActors);
 
 	if (CVarPulseBombDebugLines.GetValueOnGameThread())
 	{
-		DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 16, FColor::Red, false, 3.0f, 2, 1.0f);
+		DrawDebugSphere(GetWorld(), GetActorLocation(), MinDamage_Range, 16, FColor::Red, false, 3.0f, 2, 1.0f);
+		DrawDebugSphere(GetWorld(), GetActorLocation(), MaxDamage_Range, 16, FColor::Orange, false, 3.0f, 2, 1.0f);
 	}
 
 	for (AActor* NearbyActor : NearbyActors)
@@ -87,7 +91,18 @@ void ATPulseBomb::Explode()
 
 int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 {
-	if (! ensureMsgf(ExplosionRadius > 0, TEXT("Invalid explosion radius. Must be > 0")))
+	if (! ensureMsgf(MinDamage_Range > 0, TEXT("MinDamage_Range must be > 0")))
+	{
+		return 0;
+	}
+
+	if (!ensureMsgf(MaxDamage_Range > 0, TEXT("MaxDamage_Range must be > 0")))
+	{
+		return 0;
+	}
+
+	// Without this check, more damage could be dealt the further away the target is from the bomb 
+	if (!ensureMsgf(MinDamage_Range >= MaxDamage_Range, TEXT("MinDamage_Range must be >= MaxDamage_Range")))
 	{
 		return 0;
 	}
@@ -99,13 +114,21 @@ int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 
 	float Distance = FVector::Distance(GetActorLocation(), ActorToDamage->GetActorLocation());
 
-	if (Distance > ExplosionRadius)
+	if (Distance > MinDamage_Range)
 	{
 		return 0;
 	}
 
-	// Deal MaxDamage at 0 distance, scaling linearly down to MinDamage if Distance == ExplosionRadius
-	int Damage = FMath::Lerp(MaxDamage, MinDamage, (Distance / ExplosionRadius));
+	// Deal MaxDamage at all distances within MaxDamage_Range
+	if (Distance <= MaxDamage_Range)
+	{
+		return MaxDamage;
+	}
+
+	// Deal MaxDamage at MaxDamage_Range distance, scaling linearly down to MinDamage if Distance == MinDamage_Range.
+	//     The difference between MinDamage_Range and MaxDamage_Range determines how sharp the damage falloff is.
+	// Note: The case where (MinDamage_Range - MaxDamage_Range == 0) will have already been covered by the above checks.
+	int Damage = FMath::Lerp(MaxDamage, MinDamage, ( (Distance - MaxDamage_Range) / (MinDamage_Range - MaxDamage_Range) ));
 
 	UE_LOG(LogTemp, Log, TEXT("Distance to bomb: %f"), Distance);
 	UE_LOG(LogTemp, Log, TEXT("Damage from bomb: %i"), Damage);

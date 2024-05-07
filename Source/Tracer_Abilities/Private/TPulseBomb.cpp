@@ -179,7 +179,7 @@ void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	ProjectileMovementComp->SetVelocityInLocalSpace(FVector::Zero());
 	ProjectileMovementComp->ProjectileGravityScale = 0;
 
-	if (OtherActor == nullptr)
+	if (!OtherActor)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Pulse bomb overlapped with null OtherActor"));
 		return;

@@ -115,10 +115,17 @@ int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 		return 0;
 	}
 
+	if (IsDamagePathBlocked(ActorToDamage))
+	{
+		return 0;
+	}
+
+
 	float Distance = FVector::Distance(GetActorLocation(), ActorToDamage->GetActorLocation());
 
 	if (Distance > MinDamage_Range)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("PulseBomb tried to damage Actor outside MinDamage_Range."));
 		return 0;
 	}
 
@@ -137,6 +144,25 @@ int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 	UE_LOG(LogTemp, Log, TEXT("Damage from bomb: %i"), Damage);
 
 	return Damage;
+}
+
+bool ATPulseBomb::IsDamagePathBlocked(AActor* ActorToDamage)
+{
+	if (!ensure(ActorToDamage))
+	{
+		return true;
+	}
+
+	FCollisionObjectQueryParams Params;
+	Params.AddObjectTypesToQuery(ECC_WorldDynamic); 
+	Params.AddObjectTypesToQuery(ECC_WorldStatic);
+
+	FVector StartLocation = GetActorLocation();
+	FVector EndLocation = ActorToDamage->GetActorLocation();
+
+	FHitResult HitResult;
+
+	return GetWorld()->LineTraceSingleByObjectType(HitResult, StartLocation, EndLocation, Params);
 }
 
 void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 

@@ -68,6 +68,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	int CalculateDamage(AActor* ActorToDamage);
 
+	UFUNCTION(BlueprintCallable)
+	bool IsDamagePathBlocked(AActor* ActorToDamage);
+
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

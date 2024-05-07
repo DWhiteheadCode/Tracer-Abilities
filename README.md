@@ -88,14 +88,14 @@ The pulse bomb is implemented in two parts- the projectile and the ability. The 
 ### Projectile
 #### Explosion
 When it's spawned, the projectile starts a timer. When this timer finishes, the projectile "explodes". When the explosion occurs:
-- The projectile gets an array of all `ECC_Pawn` actors within a set radius from its location (known as `MinDamage_Range`, as this is the range at which the minimum damage will be applied). 
-	- The projectile checks each of these actors to see if they have a health component. 
-	- All of these actors that do have a health component are damaged by the projectile. 
+- The projectile gets an array of all `ECC_Pawn` actors within a set radius from its location (known as `MinDamage_Range`, as this is the range at which the minimum damage will be applied) 
+	- The projectile checks each of these actors to see if they have a health component 
+	- All of these actors that do have a health component are damaged by the projectile 
 		- If an actor is within a small radius of the bomb (`MaxDamage_Range`), maximum damage will be dealt
 		- If an actor is outside the `MaxDamage_Range` (but still inside the explosion's radius, `MinDamage_Range`), some amount of damage falloff will apply 
 			- This damage is calculated using a lerp function that takes the bomb's minimum and maximum damages, its minimum and maximum ranges, and the distance of the actor from the bomb.
-				- The actual formula used is: `FMath::Lerp(MaxDamage, MinDamage, ( (Distance - MaxDamage_Range) / (MinDamage_Range - MaxDamage_Range) ));`
-					- Note: The case where `MinDamage_Range - MaxDamage_Range == 0` is not possible due to other checks in the function. 
+			- The actual formula used is: `FMath::Lerp(MaxDamage, MinDamage, ( (Distance - MaxDamage_Range) / (MinDamage_Range - MaxDamage_Range) ));`
+				- Note: The case where `MinDamage_Range - MaxDamage_Range == 0` is not possible due to other checks in the function. 
 
 #### Stick
 The projectile also contains a sphere component. This is used to detect collisions, which is used for the "stick" mechanic. When an overlap occurs:

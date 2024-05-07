@@ -115,7 +115,7 @@ If the actor that caused the overlap is an `APawn`:
 	- If death is later implemented, some handling would likely need to be done to drop the bomb in place, and re-enable the ability for it to stick to a new actor.
 
 ### Action/ Ability
-The pulse bomb action is relatively straight forward. It simply spawns the projectile at the location of, and with the same rotation as, the user's `GetActorEyesViewPoint(...)`. The user's pawn is marked as the projectile's `Instigator`, though this is not really used for anything at this point in time.
+The pulse bomb action is relatively straight forward. It simply spawns the projectile at the location of, and with the same rotation as, the user's `GetActorEyesViewPoint(...)`. The user's pawn is marked as the projectile's `Instigator`. This is used to prevent the user from being able to stick themself with their own pulse bomb.
 
 # Debug Functionality
 Some basic debugging functionality has been included to assist with development/ to showcase functionality.

@@ -70,24 +70,22 @@ void ATPulseBomb::Explode()
 {
 	UE_LOG(LogTemp, Log, TEXT("Pulse bomb exploded"));
 
-	GetWorldTimerManager().ClearTimer(TimerHandle_LightToggle);
-	LightComp->SetVisibility(false);
-
-
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-
-	TArray<AActor*> ActorsToIgnore;
-
-	TArray<AActor*> NearbyActors;
-
-	UKismetSystemLibrary::SphereOverlapActors(this, GetActorLocation(), MinDamage_Range, ObjectTypes, nullptr, ActorsToIgnore, NearbyActors);
-
 	if (CVarPulseBombDebugLines.GetValueOnGameThread())
 	{
 		DrawDebugSphere(GetWorld(), GetActorLocation(), MinDamage_Range, 16, FColor::Red, false, 3.0f, 2, 1.0f);
 		DrawDebugSphere(GetWorld(), GetActorLocation(), MaxDamage_Range, 16, FColor::Orange, false, 3.0f, 2, 1.0f);
 	}
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_LightToggle);
+	LightComp->SetVisibility(false);
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+
+	TArray<AActor*> ActorsToIgnore;
+	TArray<AActor*> NearbyActors;
+
+	UKismetSystemLibrary::SphereOverlapActors(this, GetActorLocation(), MinDamage_Range, ObjectTypes, nullptr, ActorsToIgnore, NearbyActors);
 
 	for (AActor* NearbyActor : NearbyActors)
 	{

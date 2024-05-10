@@ -9,6 +9,7 @@
 class UStaticMeshComponent;
 class USphereComponent;
 class UProjectileMovementComponent;
+class UPointLightComponent;
 
 UCLASS()
 class TRACER_ABILITIES_API ATPulseBomb : public AActor
@@ -33,30 +34,42 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComp;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	TObjectPtr<UPointLightComponent> LightComp;
+
+	// VISUAL -------------------------------------------------
+	UPROPERTY(EditAnywhere, Category = "Visual")
+	float LightFlashDelay;
+
+	UFUNCTION(BlueprintCallable, Category = "Visual")
+	void ToggleLight();
+
+	FTimerHandle TimerHandle_LightToggle;
+
 	// BALANCE ------------------------------------------------	
-	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
+	UPROPERTY(EditAnywhere, Category = "Balance")
 	float StickRadius;
 
-	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
+	UPROPERTY(EditAnywhere, Category = "Balance")
 	float ExplosionDelay;
 
-	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
+	UPROPERTY(EditAnywhere, Category = "Balance")
 	int MinDamage;
 
-	UPROPERTY(EditAnywhere, Category = "Pulse Bomb")
+	UPROPERTY(EditAnywhere, Category = "Balance")
 	int MaxDamage;
 
 	// This is the furthest distance from the bomb that MaxDamage will be dealt.
 	// I.e. This is the distance BEFORE damage falloff starts to occur
 	// MaxDamage_Range must be <= MinDamage_Range
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pulse Bomb")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Balance")
 	float MaxDamage_Range;
 
 	// This is the distance from the bomb at which MinDamage will be dealt. 
 	// Actors that are further away from the bomb than this distance will not be damaged at all.
 	// I.e. This is the radius of the explosion.
 	// MinDamage_Range must be >= MaxDamage_Range
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pulse Bomb")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Balance")
 	float MinDamage_Range;
 
 	// OTHER --------------------------------------------------

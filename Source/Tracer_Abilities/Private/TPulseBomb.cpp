@@ -8,6 +8,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "THealthComponent.h"
+#include "Components/PointLightComponent.h"
 
 static TAutoConsoleVariable<bool> CVarPulseBombDebugLines(TEXT("t.PulseBombDebug"), false, TEXT("Draw debug lines for pulse bombs"), ECVF_Cheat);
 
@@ -22,6 +23,8 @@ ATPulseBomb::ATPulseBomb()
 	MinDamage_Range = 300;
 	MaxDamage_Range = 50;
 
+	LightFlashDelay = 0.1;
+
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
 	MeshComp->SetCollisionProfileName("NoCollision");
 	RootComponent = MeshComp;
@@ -35,6 +38,11 @@ ATPulseBomb::ATPulseBomb()
 	CollisionSphereComp->SetSphereRadius(StickRadius);
 	CollisionSphereComp->SetCollisionProfileName("Projectile");
 	CollisionSphereComp->SetGenerateOverlapEvents(true);
+
+	LightComp = CreateDefaultSubobject<UPointLightComponent>("LightComp");
+	LightComp->SetupAttachment(RootComponent);
+	LightComp->SetLightColor(FColor::Blue);
+	LightComp->SetSourceRadius(StickRadius);
 }
 
 void ATPulseBomb::PostInitializeComponents()
@@ -44,17 +52,27 @@ void ATPulseBomb::PostInitializeComponents()
 	CollisionSphereComp->OnComponentBeginOverlap.AddDynamic(this, &ATPulseBomb::OnBeginOverlap);
 }
 
+void ATPulseBomb::ToggleLight()
+{
+	LightComp->SetVisibility( !LightComp->IsVisible() );
+}
+
 void ATPulseBomb::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Explosion, this, &ATPulseBomb::Explode, ExplosionDelay, false);
+	GetWorldTimerManager().SetTimer(TimerHandle_LightToggle, this, &ATPulseBomb::ToggleLight, LightFlashDelay, true);
+	GetWorldTimerManager().SetTimer(TimerHandle_Explosion, this, &ATPulseBomb::Explode, ExplosionDelay, false);
 }
 
 
 void ATPulseBomb::Explode()
 {
 	UE_LOG(LogTemp, Log, TEXT("Pulse bomb exploded"));
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_LightToggle);
+	LightComp->SetVisibility(false);
+
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));

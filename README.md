@@ -43,15 +43,17 @@ A `TArray<FRecallData>`, called `RecallDataArray`, is used to store the recall d
 
 When the ability is initialised, the following events occur:
 - A looping timer (called the `PushRecallData` timer) is started that frequently pushes a new entry into the array, using the character's current location/ rotation/ health. 
-- A callback is registered so that the recall action will be notified whenever it's owner's health changes. When this is occurs, a new `FRecallData` entry is saved to the `RecallDataArray` to ensure no health changes are missed. 
-- A second looping timer is started (called the `ClearOldRecallData` timer). This timer iterates through the `RecallDataArray` and removes any entries that are too old to recall (e.g. any entries that were saved more than 3 seconds ago are removed, where recall returns the player to their location from 3 seconds ago). 
+- A callback is registered so that the recall action will be notified whenever it's owner's health changes. When their health changes, a new `FRecallData` entry is saved to the `RecallDataArray` to ensure no health changes are missed. 
+	- Note: A new entry is only added if the recall is not currently active. 
+- A second looping timer is started (called the `ClearOldRecallData` timer). This timer iterates through the `RecallDataArray` and removes any entries that are too old for the character to be recalled to. I.e. if the ability is configured to rewind the user to their location from 3 seconds ago, any entries from before that point (more than 3 seconds ago) are removed.
 
 This action implements `FTickableGameObject`. It is set to be a `Conditional` tickable that only ticks when the action is running (i.e. when the user is actively recalling). This is done so the player's location can be updated smoothly as they rewind towards their recall destination. 
 
 When the ability is started, the following things happen:
 - The player's character is set to be invisible, and their collision is disabled
 - The player's controller has its input disabled
-- Both the `PushRecallData` and `ClearOldRecallData` timers are cleared (to prevent data changing during the recall process)
+- The `PushRecallData` and `ClearOldRecallData` timers are paused
+	- This is not strictly necessary, but this approach ensures the user can't recall to somewhere they were during a previous recall (e.g. if the ability was set to have a low cooldown)
 - The `RecallDataArray` is cleared of any outdated entries (so the last element in the array is the destination for the recall)
 - The `RecallDataArray` is iterated through to find the player's highest health value during the period that will be recalled
 - The user's current location and rotation is saved, as well as the destination location and rotation for the recall (the point they will be recalled to)
@@ -60,15 +62,15 @@ When the ability is started, the following things happen:
 - A timer is started that ends the ability when the `ActiveDuration` has elapsed
 
 While the ability is active, the user's location and rotation are updated using a `Lerp` function that takes the following parameters:
-- Start position/ rotation
-- End position/ rotation
+- Start position or rotation
+- End position or rotation
 - Time since the ability started, divided by the total duration of the ability
 
 When the action ends, the following events occur:
 - The player's location and rotation are set to exactly match the destination 
 	- This is needed as `Tick(...)` doesn't always exactly reach the destination before the `ActiveDuration` timer ends
 - The player's health is increased to match the largest health value of any recall segment (this includes their health at the time that they started the ability)
-- The `PushRecallData` and `ClearOldRecallData` timers are started again
+- The `PushRecallData` and `ClearOldRecallData` timers are started again, and the `OnHealthChanged` callback is resubscribed
 - The recall data array is emptied
 - A data entry is immediately pushed into the array
 	- This prevents any issues that would occur if the cooldown were lower than the rate at which new entries are pushed into the queue, causing a potentially empty array

@@ -254,5 +254,8 @@ FText UTAction_Recall::GetNameText_Implementation() const
 
 void UTAction_Recall::OnOwningCharacterHealthChanged(UTHealthComponent* OwningComponent, int NewHealth, int ActualDelta)
 {
-	PushRecallData();
+	if (!bIsRunning)
+	{
+		PushRecallData();
+	}	
 }

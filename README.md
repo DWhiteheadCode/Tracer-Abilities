@@ -74,7 +74,7 @@ When the action ends, the following events occur:
 
 # Pulse Bomb
 ## Description
-The player can throw a pulse bomb. This bomb explodes after a short period of time, dealing damage in a radius around it. The closer the bomb is to a target, the more damage it will deal to that target.
+The player can throw a pulse bomb. This bomb explodes after a short period of time, dealing damage in a radius around it. The closer the bomb is to a target, the more damage it will deal to that target. While the bomb is active (i.e. before it explodes), a flashing blue light surrounds the bomb.
 
 The bomb can stick to surfaces and players. Once a bomb is stuck to an object/player, that bomb can't be un-stuck, or stick to anything else. When a bomb sticks to a player, it turns invisible.
 

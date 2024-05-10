@@ -28,7 +28,7 @@ My implementation starts by sweeping a capsule (of the same dimensions as the pl
 Recall is the most complicated of the abilities. It rewinds the player to their location a certain number of seconds ago (by default, 3 seconds). This rewind process takes an amount of time, during which:
 - The user is both invisible and has no collision
 - The user can't perform any other inputs
-- The user is shown a rough rewind animation through where they were/ where they were looking during the time that is being rewound (i.e. the 3 seconds before the ability was used)
+- The user is shown a rewind animation that moves them from their current position and camera rotation, back to their location and camera rotation from 3 seconds ago. 
 
 At the end of the ability, the player's health is set to its maximum value from any point in time during the duration that was rewound. 
 

@@ -1,7 +1,7 @@
 # Introduction
 This repository contains my recreation of Tracer's abilities from Overwatch (2), (by Blizzard Entertainment). This project was created strictly for educational purposes while I learn Unreal Engine 5. 
 
-***THIS IS A WORK IN PROGRESS!*** I still have plans for things to add/ improve, such as adding UI elements showing cooldowns, allowing multiple charges of abilities, etc. 
+***THIS IS A WORK IN PROGRESS!*** I still have plans for things to add/ improve, such as improving recall, improving pulse bomb damage/ LOS checks, adding multiplayer, etc. 
 
 Included is a basic gameplay framework for starting/ stopping actions, modifying a character's health, among other things. Most importantly, implementations of the abilities "blink", "recall", and "pulse bomb" are included. More details on these are provided below.
 

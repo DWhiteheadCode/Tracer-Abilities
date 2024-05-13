@@ -6,6 +6,7 @@
 #include "TAction.h"
 #include "TAction_Recall.generated.h"
 
+// Stores information of the action's owner from a given point in time.
 USTRUCT()
 struct FRecallData
 {
@@ -47,7 +48,7 @@ protected:
 	// The front element (index 0) is the most recent point in time, while the back element (index n) is the oldest.
 	// 
 	// Elements at the back of the array are removed once they are more than TimeToRecall seconds old (during the next PushRecallData() update)
-	// The backmost element is where the recall will position the owner, though all elements (specifically their Location) are used to "rewind" back to that point
+	// The backmost element is where the recall will position the owner, though all elements (specifically their Location + Rotation) are used to "rewind" back to that point
 	TArray<FRecallData> RecallDataArray;
 
 	// Time between successive calls of PushRecallData()
@@ -59,28 +60,30 @@ protected:
 	float TransformUpdateInterval;
 
 	// Total amount of time to rewind by (I.e. using this action will teleport the owner back to where they were
-	// this many seconds ago
+	// this many seconds ago)
 	// 
 	// Note: This is NOT the amount of time it takes for the rewind to complete after StartAction() is called.
-	//     - That is ActiveDuration.
+	//         - That is UTAction::ActiveDuration.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Recall")
 	float TimeToRecall;
 
+	// Represents whether RecallDataArray contains the maximum number of elements (based on PushInterval and TimeToRecall)
 	UPROPERTY(BlueprintReadOnly, Category = "Recall")
 	bool bQueueIsMaxSize;
 
 	FTimerHandle TimerHandle_MaxQueueSize;
-
 	FTimerHandle TimerHandle_PushRecallData;
-
 	FTimerHandle TimerHandle_RecallSegment;
 
+	// Used to toggle state based on bIsRunning. E.g. Sets OwningCharacter to be invisible and have no collision while recall is active.
 	UFUNCTION()
 	void OnActiveStateChanged();
 
 	UFUNCTION()
 	void OnMaxQueueTimerEnd();
 	
+	// Adds a new FRecallData entry to RecallDataArray based on the current state (OwningCharacter's location, rotation, health).
+	// If bQueueIsMaxSize == true, also removes one outdated element from RecallDataArray
 	UFUNCTION()
 	void PushRecallData();
 
@@ -97,5 +100,6 @@ protected:
 
 	int CurrentRecallIndex;
 
+	// The maximum Health value from RecallDataArray during the current use of recall.
 	int MaxRecalledHealth;
 };

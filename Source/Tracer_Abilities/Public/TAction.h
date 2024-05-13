@@ -25,6 +25,7 @@ class TRACER_ABILITIES_API UTAction : public UObject
 public:
 	UTAction();
 
+	// MUST BE MANUALLY CALLED
 	virtual void BeginPlay();
 
 	UPROPERTY(EditAnywhere, Category = "Action")
@@ -61,12 +62,15 @@ public:
 	FOnChargesChanged OnCooldownEnded;
 
 protected:
+	// Tags that will be applied to the UTActionComponent while this action is running
 	UPROPERTY(EditAnywhere, Category = "Tags")
 	FGameplayTagContainer GrantsTags;
 
+	// If the UTActionComponent has any of these tags, this action will not be able to start
 	UPROPERTY(EditAnywhere, Category = "Tags")
 	FGameplayTagContainer BlockedByTags;
 
+	// Determines whether StartAction() should start a timer to call StopAction() after ActiveDuration seconds
 	UPROPERTY(EditAnywhere, Category = "Action")
 	bool bSetAutoEndTimer;
 

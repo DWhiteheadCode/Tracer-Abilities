@@ -38,6 +38,7 @@ protected:
 	TObjectPtr<UPointLightComponent> LightComp;
 
 	// VISUAL -------------------------------------------------
+	// Delay between light flashes, as well as the duration of each light flash
 	UPROPERTY(EditAnywhere, Category = "Visual")
 	float LightFlashDelay;
 
@@ -47,15 +48,18 @@ protected:
 	FTimerHandle TimerHandle_LightToggle;
 
 	// BALANCE ------------------------------------------------	
+	// Radius used for the collision sphere that will "stick" the bomb to a surface/ player
 	UPROPERTY(EditAnywhere, Category = "Balance")
 	float StickRadius;
 
 	UPROPERTY(EditAnywhere, Category = "Balance")
 	float ExplosionDelay;
 
+	// Damage dealt to targets that are MinDamage_Range far away from the bomb when it explodes 
 	UPROPERTY(EditAnywhere, Category = "Balance")
 	int MinDamage;
 
+	// Damage dealt to targets that are MaxDamage_Range far away from the bomb (or closer) when it explodes 
 	UPROPERTY(EditAnywhere, Category = "Balance")
 	int MaxDamage;
 
@@ -67,7 +71,7 @@ protected:
 
 	// This is the distance from the bomb at which MinDamage will be dealt. 
 	// Actors that are further away from the bomb than this distance will not be damaged at all.
-	// I.e. This is the radius of the explosion.
+	//     I.e. This is the radius of the explosion.
 	// MinDamage_Range must be >= MaxDamage_Range
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Balance")
 	float MinDamage_Range;
@@ -81,11 +85,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	int CalculateDamage(AActor* ActorToDamage);
 
+	// Checks if terrain is blocking the path between the bomb and ActorToDamage. 
+	// Returns true if the path is blocked, and false if it is not. 
 	UFUNCTION(BlueprintCallable)
 	bool IsDamagePathBlocked(AActor* ActorToDamage);
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
 };

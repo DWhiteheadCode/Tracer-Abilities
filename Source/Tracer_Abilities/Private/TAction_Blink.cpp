@@ -68,6 +68,7 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
 	FVector InputDirection = CharacterToTeleport->GetLastMovementInputVector();
 	InputDirection.Normalize();
 
+	// If no movement direction is being input, use the ActorForwardVector as input direction
 	if (InputDirection == FVector::Zero())
 	{
 		InputDirection = CharacterToTeleport->GetActorForwardVector();
@@ -94,6 +95,8 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
 
 		FColor DebugCapsuleColor = FColor::White;
 
+		// Sweep a capsule of the same size as the character's in the input direction
+		// If it hits terrain, calculate the destination locaction based on the hit location
 		if (GetWorld()->SweepSingleByObjectType(HitResult, StartLocation, EndLocation, FQuat::Identity, Params, Shape))
 		{
 			if (CVarBlinkDebugLines.GetValueOnGameThread())

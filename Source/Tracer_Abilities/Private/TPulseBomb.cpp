@@ -52,10 +52,7 @@ void ATPulseBomb::PostInitializeComponents()
 	CollisionSphereComp->OnComponentBeginOverlap.AddDynamic(this, &ATPulseBomb::OnBeginOverlap);
 }
 
-void ATPulseBomb::ToggleLight()
-{
-	LightComp->SetVisibility( !LightComp->IsVisible() );
-}
+
 
 void ATPulseBomb::BeginPlay()
 {
@@ -75,9 +72,6 @@ void ATPulseBomb::Explode()
 		DrawDebugSphere(GetWorld(), GetActorLocation(), MinDamage_Range, 16, FColor::Red, false, 3.0f, 2, 1.0f);
 		DrawDebugSphere(GetWorld(), GetActorLocation(), MaxDamage_Range, 16, FColor::Orange, false, 3.0f, 2, 1.0f);
 	}
-
-	GetWorldTimerManager().ClearTimer(TimerHandle_LightToggle);
-	LightComp->SetVisibility(false);
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
@@ -102,6 +96,9 @@ void ATPulseBomb::Explode()
 			}
 		}
 	}
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_LightToggle);
+	LightComp->SetVisibility(false);
 
 	MeshComp->SetVisibility(false);
 	SetActorEnableCollision(false);
@@ -184,6 +181,7 @@ bool ATPulseBomb::IsDamagePathBlocked(AActor* ActorToDamage)
 void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// Ensure instigator can't be stuck by their own bomb
 	if (OtherActor == GetInstigator())
 	{
 		return;
@@ -201,10 +199,10 @@ void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		return;
 	}
 
-	APawn* OtherPawn = Cast<APawn>(OtherActor);
-
 	FColor DebugColor = FColor::Blue;
 
+	// If the other actor was a pawn, attach the bomb to them
+	APawn* OtherPawn = Cast<APawn>(OtherActor);
 	if (OtherPawn)
 	{
 		MeshComp->SetVisibility(false);
@@ -219,4 +217,9 @@ void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		DrawDebugSphere(GetWorld(), GetActorLocation(), 5.0f, 16, DebugColor, false, 3.0f, 2, 1.0f);
 	}
+}
+
+void ATPulseBomb::ToggleLight()
+{
+	LightComp->SetVisibility(!LightComp->IsVisible());
 }

@@ -64,6 +64,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> PrimaryAbilityAction;
 
+	// Starts an action in ActionComp that matches the tag PrimaryAbilityTag
 	UFUNCTION()
 	void StartPrimaryAbility();
 
@@ -74,6 +75,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> SecondaryAbilityAction;
 
+	// Starts an action in ActionComp that matches the tag SecondaryAbilityTag
 	void StartSecondaryAbility();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
@@ -83,6 +85,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> UltimateAbilityAction;
 
+	// Starts an action in ActionComp that matches the tag UltimateAbilityTag
 	void StartUltimateAbility();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")

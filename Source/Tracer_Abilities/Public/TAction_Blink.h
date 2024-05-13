@@ -25,6 +25,10 @@ public:
 	UFUNCTION()
 	void StartAction_Implementation() override;
 
+	// Returns the location that CharacterToTeleport will be teleported to after using this blink.
+	// Uses their GetLastMovementInput() to determine the blink direction. 
+	// A capsule is swept in this direction. If it hits terrain, the capsule's location at the point of the hit is returned.
+	//     If no hit occurs, MaxBlinkDistance is used to determine the location
 	UFUNCTION(BlueprintCallable, Category = "Blink")
 	FVector GetTeleportDestination(ACharacter* CharacterToTeleport);
 

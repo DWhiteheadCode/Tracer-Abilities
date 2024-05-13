@@ -20,6 +20,12 @@ UTAction::UTAction()
 
 void UTAction::BeginPlay()
 {
+	if (StartingCharges > MaxCharges)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Action [%s] has more StartingCharges than MaxCharges. Setting StargingCharges = MaxCharges."), *GetNameSafe(this));
+		StartingCharges = MaxCharges;
+	}
+
 	CurrentCharges = StartingCharges;
 
 	if (CurrentCharges < MaxCharges)

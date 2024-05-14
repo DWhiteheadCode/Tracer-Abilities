@@ -82,13 +82,13 @@ protected:
 
 	// ACTIVE DURATION ---------------------------------------
 	UPROPERTY(EditAnywhere, Category = "Action")
-	float ActiveDuration = 5;
+	float ActiveDuration = 5.f;
 
 	FTimerHandle TimerHandle_ActiveDuration;
 
 	// COOLDOWN ----------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
-	float Cooldown = 15;
+	float Cooldown = 15.f;
 	
 	FTimerHandle TimerHandle_Cooldown;
 

@@ -13,7 +13,7 @@ DECLARE_CYCLE_STAT(TEXT("UpdateActorTransform.NewSegment"), STAT_UpdateActorTran
 
 UTAction_Recall::UTAction_Recall()
 {
-	ActiveDuration = 1.5;
+	ActiveDuration = 1.5f;
 	bSetAutoEndTimer = false; // Recall manually handles ending of action
 }
 
@@ -166,7 +166,7 @@ void UTAction_Recall::UpdateActorTransform(FVector SegmentStartPos, FVector Segm
 	}	
 
 	// End of current segment
-	if (LerpValue >= 1)
+	if (LerpValue >= 1.f)
 	{
 		SCOPE_CYCLE_COUNTER(STAT_UpdateActorTransformNewSegment);
 

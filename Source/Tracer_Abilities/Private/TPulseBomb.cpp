@@ -19,8 +19,8 @@ ATPulseBomb::ATPulseBomb()
 	RootComponent = MeshComp;
 
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComp");
-	ProjectileMovementComp->InitialSpeed = 1250;
-	ProjectileMovementComp->ProjectileGravityScale = 3;
+	ProjectileMovementComp->InitialSpeed = 1250.f;
+	ProjectileMovementComp->ProjectileGravityScale = 3.f;
 
 	CollisionSphereComp = CreateDefaultSubobject<USphereComponent>("CollisionSphereComp");
 	CollisionSphereComp->SetupAttachment(RootComponent);
@@ -76,7 +76,7 @@ void ATPulseBomb::Explode()
 		{
 			if (UTHealthComponent* HealthComp = Cast<UTHealthComponent>(NearbyActor->GetComponentByClass(UTHealthComponent::StaticClass())))
 			{
-				float Damage = CalculateDamage(NearbyActor);
+				int Damage = CalculateDamage(NearbyActor);
 					
 				if (Damage > 0)
 				{
@@ -96,12 +96,12 @@ void ATPulseBomb::Explode()
 
 int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 {
-	if (! ensureMsgf(MinDamage_Range > 0, TEXT("MinDamage_Range must be > 0")))
+	if (! ensureMsgf(MinDamage_Range > 0.f, TEXT("MinDamage_Range must be > 0")))
 	{
 		return 0;
 	}
 
-	if (!ensureMsgf(MaxDamage_Range > 0, TEXT("MaxDamage_Range must be > 0")))
+	if (!ensureMsgf(MaxDamage_Range > 0.f, TEXT("MaxDamage_Range must be > 0")))
 	{
 		return 0;
 	}
@@ -180,7 +180,7 @@ void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	CollisionSphereComp->SetGenerateOverlapEvents(false);
 
 	ProjectileMovementComp->SetVelocityInLocalSpace(FVector::Zero());
-	ProjectileMovementComp->ProjectileGravityScale = 0;
+	ProjectileMovementComp->ProjectileGravityScale = 0.f;
 
 	if (!OtherActor)
 	{

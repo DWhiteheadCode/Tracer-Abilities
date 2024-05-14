@@ -57,11 +57,11 @@ protected:
 
 	// Damage dealt to targets that are MinDamage_Range far away from the bomb when it explodes 
 	UPROPERTY(EditAnywhere, Category = "Balance")
-	int MinDamage = 5.f;
+	int MinDamage = 5;
 
 	// Damage dealt to targets that are MaxDamage_Range far away from the bomb (or closer) when it explodes 
 	UPROPERTY(EditAnywhere, Category = "Balance")
-	int MaxDamage = 100.f;
+	int MaxDamage = 100;
 
 	// This is the furthest distance from the bomb that MaxDamage will be dealt.
 	// I.e. This is the distance BEFORE damage falloff starts to occur

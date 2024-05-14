@@ -14,14 +14,7 @@ DECLARE_CYCLE_STAT(TEXT("UpdateActorTransform.NewSegment"), STAT_UpdateActorTran
 UTAction_Recall::UTAction_Recall()
 {
 	ActiveDuration = 1.5;
-
-	PushInterval = 0.05;
-	TransformUpdateInterval = 0.0167;
-	TimeToRecall = 3;
-	bQueueIsMaxSize = false;
-	CurrentRecallIndex = -1;
 	bSetAutoEndTimer = false; // Recall manually handles ending of action
-	MaxRecalledHealth = 0;
 }
 
 void UTAction_Recall::BeginPlay()

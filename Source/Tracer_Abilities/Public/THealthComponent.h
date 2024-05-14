@@ -36,9 +36,9 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Health")
-	int Health;
+	int Health = 100;
 
 	UPROPERTY(EditAnywhere, Category = "Health")
-	int HealthMax;
+	int HealthMax = 100;
 
 };

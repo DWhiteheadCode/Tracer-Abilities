@@ -53,11 +53,11 @@ protected:
 
 	// Time between successive calls of PushRecallData()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Recall")
-	float PushInterval; 
+	float PushInterval = 0.05f; 
 
 	// Time between updates to actor's position during the use of recall
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Recall")
-	float TransformUpdateInterval;
+	float TransformUpdateInterval = 0.0167f;
 
 	// Total amount of time to rewind by (I.e. using this action will teleport the owner back to where they were
 	// this many seconds ago)
@@ -65,11 +65,11 @@ protected:
 	// Note: This is NOT the amount of time it takes for the rewind to complete after StartAction() is called.
 	//         - That is UTAction::ActiveDuration.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Recall")
-	float TimeToRecall;
+	float TimeToRecall = 3.f;
 
 	// Represents whether RecallDataArray contains the maximum number of elements (based on PushInterval and TimeToRecall)
 	UPROPERTY(BlueprintReadOnly, Category = "Recall")
-	bool bQueueIsMaxSize;
+	bool bQueueIsMaxSize = false;
 
 	FTimerHandle TimerHandle_MaxQueueSize;
 	FTimerHandle TimerHandle_PushRecallData;
@@ -98,8 +98,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<ACharacter> OwningCharacter;
 
-	int CurrentRecallIndex;
+	int CurrentRecallIndex = -1;
 
 	// The maximum Health value from RecallDataArray during the current use of recall.
-	int MaxRecalledHealth;
+	int MaxRecalledHealth = 0;
 };

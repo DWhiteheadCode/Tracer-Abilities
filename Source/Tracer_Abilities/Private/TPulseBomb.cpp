@@ -14,17 +14,6 @@ static TAutoConsoleVariable<bool> CVarPulseBombDebugLines(TEXT("t.PulseBombDebug
 
 ATPulseBomb::ATPulseBomb()
 {
-	StickRadius = 20;
-	ExplosionDelay = 2;
-	
-	MinDamage = 5;
-	MaxDamage = 100;
-
-	MinDamage_Range = 300;
-	MaxDamage_Range = 50;
-
-	LightFlashDelay = 0.1;
-
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
 	MeshComp->SetCollisionProfileName("NoCollision");
 	RootComponent = MeshComp;

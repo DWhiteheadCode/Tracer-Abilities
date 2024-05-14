@@ -72,23 +72,23 @@ protected:
 
 	// Determines whether StartAction() should start a timer to call StopAction() after ActiveDuration seconds
 	UPROPERTY(EditAnywhere, Category = "Action")
-	bool bSetAutoEndTimer;
+	bool bSetAutoEndTimer = true;
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	UTActionComponent* GetOwningComponent() const;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Action")
-	bool bIsRunning;
+	bool bIsRunning = false;
 
 	// ACTIVE DURATION ---------------------------------------
 	UPROPERTY(EditAnywhere, Category = "Action")
-	float ActiveDuration;
+	float ActiveDuration = 5;
 
 	FTimerHandle TimerHandle_ActiveDuration;
 
 	// COOLDOWN ----------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
-	float Cooldown;
+	float Cooldown = 15;
 	
 	FTimerHandle TimerHandle_Cooldown;
 
@@ -102,11 +102,11 @@ protected:
 
 	// CHARGES -----------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
-	int MaxCharges;
+	int MaxCharges = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
-	int StartingCharges;
+	int StartingCharges = 1;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Action")
-	int CurrentCharges;
+	int CurrentCharges = 1;
 };

@@ -17,8 +17,6 @@ UTAction_Blink::UTAction_Blink()
 	
 	MaxCharges = 3;
 	StartingCharges = 3;
-
-	MaxBlinkDistance = 350;
 }
 
 void UTAction_Blink::StartAction_Implementation()

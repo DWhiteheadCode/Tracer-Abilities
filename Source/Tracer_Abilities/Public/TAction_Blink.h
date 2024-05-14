@@ -20,7 +20,7 @@ public:
 	UTAction_Blink();
 
 	UPROPERTY(EditDefaultsOnly, Category="Blink")
-	float MaxBlinkDistance;
+	float MaxBlinkDistance = 350.f;
 
 	UFUNCTION()
 	void StartAction_Implementation() override;

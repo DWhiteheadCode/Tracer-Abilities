@@ -7,15 +7,6 @@
 
 UTAction::UTAction()
 {
-	bIsRunning = false;
-	bSetAutoEndTimer = true;
-
-	Cooldown = 15;
-	ActiveDuration = 5;
-		
-	MaxCharges = 1;
-	StartingCharges = 1;
-	CurrentCharges = 1;
 }
 
 void UTAction::BeginPlay()

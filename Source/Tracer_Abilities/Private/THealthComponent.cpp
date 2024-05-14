@@ -5,8 +5,6 @@
 
 UTHealthComponent::UTHealthComponent()
 {
-	Health = 100;
-	HealthMax = 100;
 }
 
 int UTHealthComponent::GetHealth() const

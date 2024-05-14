@@ -34,7 +34,7 @@ void UTAction::StartAction_Implementation()
 
 	UE_LOG(LogTemp, Log, TEXT("Started Action: %s"), *GetNameSafe(this));
 
-	UTActionComponent* ActionComp = GetOwningComponent();
+	UTActionComponent* const ActionComp = GetOwningComponent();
 	ActionComp->ActiveGameplayTags.AppendTags(GrantsTags);
 	bIsRunning = true;	
 	
@@ -63,13 +63,13 @@ void UTAction::StopAction_Implementation()
 
 	UE_LOG(LogTemp, Log, TEXT("Stopped Action: %s"), *GetNameSafe(this));
 
-	UTActionComponent* ActionComp = GetOwningComponent();
+	UTActionComponent* const ActionComp = GetOwningComponent();
 	ActionComp->ActiveGameplayTags.RemoveTags(GrantsTags);
 
 	bIsRunning = false;
 }
 
-bool UTAction::CanStart_Implementation()
+bool UTAction::CanStart() const
 {
 	if (IsRunning())
 	{
@@ -89,7 +89,12 @@ bool UTAction::CanStart_Implementation()
 		return false;
 	}
 
-	UTActionComponent* ActionComp = GetOwningComponent();
+	UTActionComponent* const ActionComp = GetOwningComponent();
+	if (!ActionComp)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Action [%s] can't start: No ActionComponent"), *GetNameSafe(this));
+		return false;
+	}
 
 	if (ActionComp->ActiveGameplayTags.HasAny(BlockedByTags))
 	{

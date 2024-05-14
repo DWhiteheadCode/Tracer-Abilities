@@ -88,9 +88,9 @@ protected:
 	void PushRecallData();
 
 	UFUNCTION()
-	void UpdateActorTransform(FVector SegmentStartPos, FVector SegmentEndPos, 
-		FRotator SegmentStartRot, FRotator SegmentEndRot,
-		float SegmentStartTime, float SegmentDuration);
+	void UpdateActorTransform(const FVector SegmentStartPos, const FVector SegmentEndPos, 
+		const FRotator SegmentStartRot, const FRotator SegmentEndRot,
+		const float SegmentStartTime, const float SegmentDuration);
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UTActionComponent> OwningComp;

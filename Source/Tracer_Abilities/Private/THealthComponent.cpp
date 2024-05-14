@@ -17,18 +17,18 @@ int UTHealthComponent::GetHealthMax() const
 	return HealthMax;
 }
 
-void UTHealthComponent::ApplyDamage(int Damage)
+void UTHealthComponent::ApplyDamage(const int Damage)
 {
 	if (!ensure(Damage >= 0))
 	{
 		return;
 	}
 
-	int OldHealth = Health;
+	const int OldHealth = Health;
 
 	Health = FMath::Max(0, Health - Damage);
 
-	int ActualDelta = Health - OldHealth;
+	const int ActualDelta = Health - OldHealth;
 
 	if (ActualDelta != 0)
 	{
@@ -36,18 +36,18 @@ void UTHealthComponent::ApplyDamage(int Damage)
 	}	
 }
 
-void UTHealthComponent::ApplyHeal(int Amount)
+void UTHealthComponent::ApplyHeal(const int Amount)
 {
 	if (!ensure(Amount >= 0))
 	{
 		return;
 	}
 
-	int OldHealth = Health;
+	const int OldHealth = Health;
 
 	Health = FMath::Min(Health + Amount, HealthMax);
 
-	int ActualDelta = Health - OldHealth;
+	const int ActualDelta = Health - OldHealth;
 
 	if (ActualDelta != 0)
 	{
@@ -55,12 +55,12 @@ void UTHealthComponent::ApplyHeal(int Amount)
 	}
 }
 
-void UTHealthComponent::SetHealth(int NewHealth)
+void UTHealthComponent::SetHealth(const int NewHealth)
 {
-	int OldHealth = Health;
+	const int OldHealth = Health;
 	Health = FMath::Clamp(NewHealth, 0, HealthMax);
 
-	int ActualDelta = Health - OldHealth;
+	const int ActualDelta = Health - OldHealth;
 
 	if (ActualDelta != 0)
 	{

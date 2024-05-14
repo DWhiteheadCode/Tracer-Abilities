@@ -83,12 +83,12 @@ protected:
 	void Explode();
 
 	UFUNCTION(BlueprintCallable)
-	int CalculateDamage(AActor* ActorToDamage);
+	int CalculateDamage(AActor* const ActorToDamage) const;
 
 	// Checks if terrain is blocking the path between the bomb and ActorToDamage. 
 	// Returns true if the path is blocked, and false if it is not. 
 	UFUNCTION(BlueprintCallable)
-	bool IsDamagePathBlocked(AActor* ActorToDamage);
+	bool IsDamagePathBlocked(AActor* const ActorToDamage) const;
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 

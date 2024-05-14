@@ -41,8 +41,6 @@ void ATPulseBomb::PostInitializeComponents()
 	CollisionSphereComp->OnComponentBeginOverlap.AddDynamic(this, &ATPulseBomb::OnBeginOverlap);
 }
 
-
-
 void ATPulseBomb::BeginPlay()
 {
 	Super::BeginPlay();
@@ -50,7 +48,6 @@ void ATPulseBomb::BeginPlay()
 	GetWorldTimerManager().SetTimer(TimerHandle_LightToggle, this, &ATPulseBomb::ToggleLight, LightFlashDelay, true);
 	GetWorldTimerManager().SetTimer(TimerHandle_Explosion, this, &ATPulseBomb::Explode, ExplosionDelay, false);
 }
-
 
 void ATPulseBomb::Explode()
 {
@@ -65,18 +62,18 @@ void ATPulseBomb::Explode()
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 
-	TArray<AActor*> ActorsToIgnore;
+	const TArray<AActor*> ActorsToIgnore;
 	TArray<AActor*> NearbyActors;
 
 	UKismetSystemLibrary::SphereOverlapActors(this, GetActorLocation(), MinDamage_Range, ObjectTypes, nullptr, ActorsToIgnore, NearbyActors);
 
-	for (AActor* NearbyActor : NearbyActors)
+	for (AActor* const NearbyActor : NearbyActors)
 	{
 		if (NearbyActor)
 		{
-			if (UTHealthComponent* HealthComp = Cast<UTHealthComponent>(NearbyActor->GetComponentByClass(UTHealthComponent::StaticClass())))
+			if (UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(NearbyActor->GetComponentByClass(UTHealthComponent::StaticClass())))
 			{
-				int Damage = CalculateDamage(NearbyActor);
+				const int Damage = CalculateDamage(NearbyActor);
 					
 				if (Damage > 0)
 				{
@@ -94,7 +91,7 @@ void ATPulseBomb::Explode()
 	SetLifeSpan(2.f);
 }
 
-int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
+int ATPulseBomb::CalculateDamage(AActor* const ActorToDamage) const
 {
 	if (! ensureMsgf(MinDamage_Range > 0.f, TEXT("MinDamage_Range must be > 0")))
 	{
@@ -123,7 +120,7 @@ int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 	}
 
 
-	float Distance = FVector::Distance(GetActorLocation(), ActorToDamage->GetActorLocation());
+	const float Distance = FVector::Distance(GetActorLocation(), ActorToDamage->GetActorLocation());
 
 	if (Distance > MinDamage_Range)
 	{
@@ -140,7 +137,7 @@ int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 	// Deal MaxDamage at MaxDamage_Range distance, scaling linearly down to MinDamage if Distance == MinDamage_Range.
 	//     The difference between MinDamage_Range and MaxDamage_Range determines how sharp the damage falloff is.
 	// Note: The case where (MinDamage_Range - MaxDamage_Range == 0) will have already been covered by the above checks.
-	int Damage = FMath::Lerp(MaxDamage, MinDamage, ( (Distance - MaxDamage_Range) / (MinDamage_Range - MaxDamage_Range) ));
+	const int Damage = FMath::Lerp(MaxDamage, MinDamage, ( (Distance - MaxDamage_Range) / (MinDamage_Range - MaxDamage_Range) ));
 
 	UE_LOG(LogTemp, Log, TEXT("Distance to bomb: %f"), Distance);
 	UE_LOG(LogTemp, Log, TEXT("Damage from bomb: %i"), Damage);
@@ -148,7 +145,7 @@ int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 	return Damage;
 }
 
-bool ATPulseBomb::IsDamagePathBlocked(AActor* ActorToDamage)
+bool ATPulseBomb::IsDamagePathBlocked(AActor* const ActorToDamage) const
 {
 	if (!ensure(ActorToDamage))
 	{
@@ -159,8 +156,8 @@ bool ATPulseBomb::IsDamagePathBlocked(AActor* ActorToDamage)
 	Params.AddObjectTypesToQuery(ECC_WorldDynamic); 
 	Params.AddObjectTypesToQuery(ECC_WorldStatic);
 
-	FVector StartLocation = GetActorLocation();
-	FVector EndLocation = ActorToDamage->GetActorLocation();
+	const FVector StartLocation = GetActorLocation();
+	const FVector EndLocation = ActorToDamage->GetActorLocation();
 
 	FHitResult HitResult;
 
@@ -191,7 +188,7 @@ void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	FColor DebugColor = FColor::Blue;
 
 	// If the other actor was a pawn, attach the bomb to them
-	APawn* OtherPawn = Cast<APawn>(OtherActor);
+	APawn* const OtherPawn = Cast<APawn>(OtherActor);
 	if (OtherPawn)
 	{
 		MeshComp->SetVisibility(false);

@@ -56,7 +56,7 @@ void UTAction_Recall::PushRecallData()
 			RecallData.Location = OwningCharacter->GetActorLocation();
 			RecallData.Rotation = OwningCharacter->GetControlRotation();
 
-			if (UTHealthComponent* HealthComp = Cast<UTHealthComponent>(
+			if (UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(
 				OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass())))
 			{
 				RecallData.Health = HealthComp->GetHealth();
@@ -76,12 +76,12 @@ void UTAction_Recall::OnActiveStateChanged()
 
 	OwningCharacter->SetActorEnableCollision(!bIsRunning);
 
-	if (USkeletalMeshComponent* CharacterMesh = OwningCharacter->GetMesh())
+	if (USkeletalMeshComponent* const CharacterMesh = OwningCharacter->GetMesh())
 	{
 		CharacterMesh->SetVisibility(!bIsRunning);
 	}
 
-	if (APlayerController* Controller = Cast<APlayerController>(OwningCharacter->GetController()))
+	if (APlayerController* const Controller = Cast<APlayerController>(OwningCharacter->GetController()))
 	{
 		if (bIsRunning)
 		{
@@ -116,11 +116,11 @@ void UTAction_Recall::StartAction_Implementation()
 
 	CurrentRecallIndex = 0;
 
-	float SegmentDuration = ActiveDuration / RecallDataArray.Num();
-	float StartTime = OwningCharacter->GetWorld()->GetTimeSeconds();
+	const float SegmentDuration = ActiveDuration / RecallDataArray.Num();
+	const float StartTime = OwningCharacter->GetWorld()->GetTimeSeconds();
 	
-	FVector SegmentEndLocation = RecallDataArray[0].Location;
-	FRotator SegmentEndRotation = RecallDataArray[0].Rotation;
+	const FVector SegmentEndLocation = RecallDataArray[0].Location;
+	const FRotator SegmentEndRotation = RecallDataArray[0].Rotation;
 
 	MaxRecalledHealth = RecallDataArray[0].Health;
 
@@ -143,8 +143,8 @@ void UTAction_Recall::StartAction_Implementation()
 	OwningCharacter->GetWorld()->GetTimerManager().SetTimer(TimerHandle_RecallSegment, Delegate, TransformUpdateInterval, true);
 }
 
-void UTAction_Recall::UpdateActorTransform(FVector SegmentStartPos, FVector SegmentEndPos, FRotator SegmentStartRot, FRotator SegmentEndRot, 	
-	float SegmentStartTime, float SegmentDuration)
+void UTAction_Recall::UpdateActorTransform(const FVector SegmentStartPos, const FVector SegmentEndPos, const FRotator SegmentStartRot, 
+	const FRotator SegmentEndRot, const float SegmentStartTime, const float SegmentDuration)
 {
 	SCOPE_CYCLE_COUNTER(STAT_UpdateActorTransform);
 
@@ -153,14 +153,14 @@ void UTAction_Recall::UpdateActorTransform(FVector SegmentStartPos, FVector Segm
 		return;
 	}
 
-	float CurrentTime = OwningCharacter->GetWorld()->GetTimeSeconds();
-	float LerpValue = FMath::Clamp( ((CurrentTime - SegmentStartTime) / SegmentDuration), 0.f, 1.f);
+	const float CurrentTime = OwningCharacter->GetWorld()->GetTimeSeconds();
+	const float LerpValue = FMath::Clamp( ((CurrentTime - SegmentStartTime) / SegmentDuration), 0.f, 1.f);
 
-	FVector CurrentPos = FMath::Lerp(SegmentStartPos, SegmentEndPos, LerpValue);
-	FRotator CurrentRot = FMath::Lerp(SegmentStartRot, SegmentEndRot, LerpValue);
+	const FVector CurrentPos = FMath::Lerp(SegmentStartPos, SegmentEndPos, LerpValue);
+	const FRotator CurrentRot = FMath::Lerp(SegmentStartRot, SegmentEndRot, LerpValue);
 
 	OwningCharacter->SetActorLocation(CurrentPos);
-	if (AController* Controller = OwningCharacter->GetController())
+	if (AController* const Controller = OwningCharacter->GetController())
 	{
 		Controller->SetControlRotation(CurrentRot);
 	}	
@@ -187,11 +187,11 @@ void UTAction_Recall::UpdateActorTransform(FVector SegmentStartPos, FVector Segm
 				
 		MaxRecalledHealth = FMath::Max(MaxRecalledHealth, RecallDataArray[CurrentRecallIndex].Health);
 		
-		FVector NextSegmentStartPos = SegmentEndPos;
-		FVector NextSegmentEndPos = RecallDataArray[CurrentRecallIndex].Location;
+		const FVector NextSegmentStartPos = SegmentEndPos;
+		const FVector NextSegmentEndPos = RecallDataArray[CurrentRecallIndex].Location;
 
-		FRotator NextSegmentStartRot = SegmentEndRot;
-		FRotator NextSegmentEndRot = RecallDataArray[CurrentRecallIndex].Rotation;
+		const FRotator NextSegmentStartRot = SegmentEndRot;
+		const FRotator NextSegmentEndRot = RecallDataArray[CurrentRecallIndex].Rotation;
 
 		FTimerDelegate Delegate;
 		Delegate.BindUFunction(this, "UpdateActorTransform",
@@ -221,7 +221,7 @@ void UTAction_Recall::StopAction_Implementation()
 	{
 		//UE_LOG(LogTemp, Log, TEXT("\tEnd Time: %f"), (OwningCharacter->GetWorld()->GetTimeSeconds()));
 
-		UTHealthComponent* HealthComp = Cast<UTHealthComponent>(OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
+		UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
 		if (HealthComp)
 		{		
 			if (MaxRecalledHealth > HealthComp->GetHealth())

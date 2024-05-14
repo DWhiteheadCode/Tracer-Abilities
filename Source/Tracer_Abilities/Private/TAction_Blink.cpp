@@ -23,26 +23,26 @@ void UTAction_Blink::StartAction_Implementation()
 {
 	Super::StartAction_Implementation();
 
-	UTActionComponent* OwningComp = GetOwningComponent();
+	UTActionComponent* const OwningComp = GetOwningComponent();
 	if (!ensure(OwningComp))
 	{
 		return;
 	}
 
-	ACharacter* OwningCharacter = Cast<ACharacter>(OwningComp->GetOwner());
+	ACharacter* const OwningCharacter = Cast<ACharacter>(OwningComp->GetOwner());
 	if (!ensure(OwningCharacter))
 	{
 		return;
 	}
 
-	FVector Destination = GetTeleportDestination(OwningCharacter);
+	const FVector Destination = GetTeleportDestination(OwningCharacter);
 
 	// Manually update the character's velocity to prevent carrying momentum in the opposite direction of the blink
-	if (UCharacterMovementComponent* MoveComp = OwningCharacter->GetCharacterMovement())
+	if (UCharacterMovementComponent* const MoveComp = OwningCharacter->GetCharacterMovement())
 	{
 		FVector OldVelocity = MoveComp->Velocity;
 		OldVelocity.Z = 0; // Ignore vertical velocity
-		float Speed = OldVelocity.Size();
+		const float Speed = OldVelocity.Size();
 
 		FVector InputDirection = OwningCharacter->GetLastMovementInputVector();
 		InputDirection.Normalize();
@@ -53,7 +53,7 @@ void UTAction_Blink::StartAction_Implementation()
 	OwningCharacter->TeleportTo(Destination, OwningCharacter->GetActorRotation());
 }
 
-FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
+FVector UTAction_Blink::GetTeleportDestination(ACharacter* const CharacterToTeleport)
 {
 	if (!ensure(CharacterToTeleport))
 	{
@@ -62,7 +62,7 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
 
 	FHitResult HitResult;
 
-	FVector StartLocation = CharacterToTeleport->GetActorLocation();
+	const FVector StartLocation = CharacterToTeleport->GetActorLocation();
 	FVector InputDirection = CharacterToTeleport->GetLastMovementInputVector();
 	InputDirection.Normalize();
 
@@ -86,7 +86,7 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
 
 	FCollisionShape Shape;
 
-	UCapsuleComponent* CharacterCapsule = CharacterToTeleport->GetCapsuleComponent();
+	UCapsuleComponent* const CharacterCapsule = CharacterToTeleport->GetCapsuleComponent();
 	if (ensure(CharacterCapsule))
 	{
 		Shape.SetCapsule(CharacterCapsule->GetScaledCapsuleRadius(), CharacterCapsule->GetScaledCapsuleHalfHeight());

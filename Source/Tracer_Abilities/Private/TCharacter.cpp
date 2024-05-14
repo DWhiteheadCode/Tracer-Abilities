@@ -23,9 +23,9 @@ void ATCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	if (APlayerController* const PlayerController = Cast<APlayerController>(GetController()))
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem 
+		if (UEnhancedInputLocalPlayerSubsystem* const Subsystem 
 			= ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultInputMappingContext, 0);
@@ -37,7 +37,7 @@ void ATCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	if (UEnhancedInputComponent* const EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		// Movement
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ATCharacter::Move);
@@ -57,11 +57,8 @@ void ATCharacter::Move(const FInputActionValue& Value)
 
 	if (GetController())
 	{
-		FVector Forward = GetActorForwardVector();
-		AddMovementInput(Forward, MoveValue.X);
-
-		FVector Right = GetActorRightVector();
-		AddMovementInput(Right, MoveValue.Y);
+		AddMovementInput(GetActorForwardVector(), MoveValue.X);
+		AddMovementInput(GetActorRightVector(), MoveValue.Y);
 	}
 }
 

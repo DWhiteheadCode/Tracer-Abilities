@@ -22,13 +22,13 @@ public:
 	void BeginPlay() override;
 	
 	UFUNCTION(BlueprintCallable, Category = "Actions")
-	void AddAction(TSubclassOf<UTAction> ActionClass);
+	void AddAction(const TSubclassOf<UTAction> ActionClass);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
-	bool StartActionByTag(FGameplayTag ActionTag);
+	bool StartActionByTag(const FGameplayTag ActionTag);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
-	bool StopActionByTag(FGameplayTag ActionTag);
+	bool StopActionByTag(const FGameplayTag ActionTag);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Tags")
 	FGameplayTagContainer ActiveGameplayTags;	

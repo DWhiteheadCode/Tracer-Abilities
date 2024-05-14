@@ -23,13 +23,13 @@ public:
 	int GetHealthMax() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	void ApplyDamage(int Damage);
+	void ApplyDamage(const int Damage);
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	void ApplyHeal(int Amount);
+	void ApplyHeal(const int Amount);
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	void SetHealth(int NewHealth);
+	void SetHealth(const int NewHealth);
 
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 	FOnHealthChanged OnHealthChanged;

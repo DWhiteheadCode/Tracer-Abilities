@@ -31,8 +31,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Action")
 	FGameplayTag IdentifierTag;
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Action")
-	bool CanStart();
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	bool CanStart() const;
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	void StartAction();

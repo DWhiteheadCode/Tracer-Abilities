@@ -21,7 +21,7 @@ void UTAction_PulseBomb::StartAction_Implementation()
 		return;
 	}
 
-	APawn* OwningPawn = Cast<APawn>(GetOwningComponent()->GetOwner());
+	APawn* const OwningPawn = Cast<APawn>(GetOwningComponent()->GetOwner());
 	if (!ensure(OwningPawn))
 	{
 		return;
@@ -35,7 +35,7 @@ void UTAction_PulseBomb::StartAction_Implementation()
 	FVector EyeLocation;
 	OwningPawn->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
-	FTransform SpawnTM = FTransform(EyeRotation, EyeLocation);
+	const FTransform SpawnTM = FTransform(EyeRotation, EyeLocation);
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 }

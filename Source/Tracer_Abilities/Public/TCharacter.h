@@ -93,5 +93,5 @@ protected:
 
 	// DEBUG --------------------------------------------------------------
 	UFUNCTION(Exec)
-	void HealSelf(float Amount = 100);
+	void HealSelf(int Amount = 100);
 };

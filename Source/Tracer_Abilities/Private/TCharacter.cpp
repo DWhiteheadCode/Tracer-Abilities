@@ -91,7 +91,7 @@ void ATCharacter::StartUltimateAbility()
 	ActionComp->StartActionByTag(UltimateAbilityTag);
 }
 
-void ATCharacter::HealSelf(float Amount)
+void ATCharacter::HealSelf(int Amount)
 {
 	if (Amount > 0)
 	{

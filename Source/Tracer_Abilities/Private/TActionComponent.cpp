@@ -8,17 +8,22 @@
 
 void UTActionComponent::AddAction(const TSubclassOf<UTAction> ActionClass)
 {
-	if (!ensure(ActionClass))
+	if (!ActionClass)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't AddAction to ActionComponent: ActionClass was null."));
 		return;
 	}
 
 	UTAction* const NewAction = NewObject<UTAction>(this, ActionClass);
-	if (ensure(NewAction))
+	if (NewAction)
 	{
 		NewAction->BeginPlay();
 		Actions.Add(NewAction);
 		OnActionAdded.Broadcast(NewAction);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't AddAction to ActionComponent: NewAction creation failed."));
 	}
 }
 

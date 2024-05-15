@@ -19,8 +19,9 @@ int UTHealthComponent::GetHealthMax() const
 
 void UTHealthComponent::ApplyDamage(const int Damage)
 {
-	if (!ensure(Damage >= 0))
+	if (Damage < 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Tried to apply negative damage (%i) to HealthComponent. Health will not change."), Damage);
 		return;
 	}
 
@@ -38,8 +39,9 @@ void UTHealthComponent::ApplyDamage(const int Damage)
 
 void UTHealthComponent::ApplyHeal(const int Amount)
 {
-	if (!ensure(Amount >= 0))
+	if (Amount < 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Tried to apply negative heal (%i) to HealthComponent. Health will not change."), Amount);
 		return;
 	}
 
@@ -57,6 +59,11 @@ void UTHealthComponent::ApplyHeal(const int Amount)
 
 void UTHealthComponent::SetHealth(const int NewHealth)
 {
+	if (NewHealth < 0 || NewHealth > HealthMax)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Tried to set HealthComponent Health to an out-of-bounds value [%i] which is < 0 or > HealthMax [%i]. Health will be updated, but clamped to this range."), NewHealth, HealthMax);
+	}
+
 	const int OldHealth = Health;
 	Health = FMath::Clamp(NewHealth, 0, HealthMax);
 

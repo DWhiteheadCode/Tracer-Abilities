@@ -109,8 +109,9 @@ int ATPulseBomb::CalculateDamage(AActor* const ActorToDamage) const
 		return 0;
 	}
 
-	if (!ensure(ActorToDamage))
+	if (!ActorToDamage)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("PulseBomb tried to calculate damage for nullptr ActorToDamage"));
 		return 0;
 	}
 
@@ -147,8 +148,9 @@ int ATPulseBomb::CalculateDamage(AActor* const ActorToDamage) const
 
 bool ATPulseBomb::IsDamagePathBlocked(AActor* const ActorToDamage) const
 {
-	if (!ensure(ActorToDamage))
+	if (!ActorToDamage)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Pulse Bomb tried to check IsDamagePathBlocked for nullptr ActorToDamage. Returning true."));
 		return true;
 	}
 

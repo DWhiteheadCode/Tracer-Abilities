@@ -22,8 +22,9 @@ void UTAction_PulseBomb::StartAction_Implementation()
 	}
 
 	APawn* const OwningPawn = Cast<APawn>(GetOwningComponent()->GetOwner());
-	if (!ensure(OwningPawn))
+	if (!OwningPawn)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Coudln't start PulseBomb Action as OwningPawn was nullptr"));
 		return;
 	}
 

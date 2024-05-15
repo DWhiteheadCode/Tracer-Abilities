@@ -27,8 +27,9 @@ void UTAction::BeginPlay()
 
 void UTAction::StartAction_Implementation()
 {
-	if (!ensureAlways(CanStart()))
+	if (!CanStart())
 	{
+		UE_LOG(LogTemp, Log, TEXT("Tried to start action [%s], but CanStart() returned false"), *GetNameSafe(this));
 		return;
 	}
 
@@ -56,8 +57,9 @@ void UTAction::StartAction_Implementation()
 
 void UTAction::StopAction_Implementation()
 {
-	if ( ! ensureAlways(bIsRunning))
+	if (!bIsRunning)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Tried to stop Action [%s], but it wasn't running"), *GetNameSafe(this));
 		return;
 	}
 

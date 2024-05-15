@@ -24,14 +24,16 @@ void UTAction_Blink::StartAction_Implementation()
 	Super::StartAction_Implementation();
 
 	UTActionComponent* const OwningComp = GetOwningComponent();
-	if (!ensure(OwningComp))
+	if (!OwningComp)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Tried to start Blink Action, but it didn't have OwningComp"));
 		return;
 	}
 
 	ACharacter* const OwningCharacter = Cast<ACharacter>(OwningComp->GetOwner());
-	if (!ensure(OwningCharacter))
+	if (!OwningCharacter)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Tried to start Blink Action, but it didn't have OwningCharacter"));
 		return;
 	}
 
@@ -55,8 +57,9 @@ void UTAction_Blink::StartAction_Implementation()
 
 FVector UTAction_Blink::GetTeleportDestination(ACharacter* const CharacterToTeleport)
 {
-	if (!ensure(CharacterToTeleport))
+	if (!CharacterToTeleport)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Blink tried to GetTeleportDestination for nullptr Character"));
 		return FVector::Zero();
 	}
 
@@ -87,7 +90,7 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* const CharacterToTele
 	FCollisionShape Shape;
 
 	UCapsuleComponent* const CharacterCapsule = CharacterToTeleport->GetCapsuleComponent();
-	if (ensure(CharacterCapsule))
+	if (CharacterCapsule)
 	{
 		Shape.SetCapsule(CharacterCapsule->GetScaledCapsuleRadius(), CharacterCapsule->GetScaledCapsuleHalfHeight());
 
@@ -117,6 +120,10 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* const CharacterToTele
 			DrawDebugCapsule(GetWorld(), EndLocation, CharacterCapsule->GetScaledCapsuleHalfHeight(),
 				CharacterCapsule->GetScaledCapsuleRadius(), FQuat::Identity, DebugCapsuleColor, false, 5.0f);
 		}		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Blink couldn't perform sweep as CharacterToTeleport didn't have a UCapsuleComponent. Using MaxBlinkDistance to calculate EndLocation."));
 	}
 
 	return EndLocation;

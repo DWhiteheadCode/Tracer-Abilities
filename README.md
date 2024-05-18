@@ -40,7 +40,7 @@ Recall is bound to `E`.
 
 Video (Current Implementation): https://www.youtube.com/watch?v=CZR3G1ZqM18
 
-Video (WIP Implementation): https://www.youtube.com/watch?v=c5dm0MxTlEo
+Video (WIP Implementation - see `recall-overhaul` branch): https://www.youtube.com/watch?v=c5dm0MxTlEo
 
 ## Implementation
 I created an `FRecallData` struct that stores the data for any given point in time. This includes the character's location, rotation (specifically, their `APawn::GetControlRotation()`) and health. 

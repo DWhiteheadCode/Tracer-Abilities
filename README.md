@@ -1,7 +1,7 @@
 # Introduction
 This repository contains my recreation of Tracer's abilities from Overwatch (2), (by Blizzard Entertainment). This project was created strictly for educational purposes while I learn Unreal Engine 5. 
 
-***THIS IS A WORK IN PROGRESS!*** I still have plans for things to add/ improve, such as improving recall, improving pulse bomb damage/ LOS checks, adding multiplayer, etc. 
+I still have plans for things to add/ improve for this project, such as improving recall, improving pulse bomb damage/ LOS checks, adding multiplayer, etc. 
 
 Included is a basic gameplay framework for starting/ stopping actions, modifying a character's health, among other things. Most importantly, implementations of the abilities "blink", "recall", and "pulse bomb" are included. More details on these are provided below.
 
@@ -14,6 +14,8 @@ Blink allows the player to teleport a short distance in the direction of their m
 Blink has 3 starting charges and 3 max charges, each with a 10 second cooldown. If multiple charges have been consumed, one charge will be restored every 10 seconds.
 
 Blink is bound to `Left Shift` and `Right Click` (i.e. either key can be used).
+
+Video: https://www.youtube.com/watch?v=fE_zr3Qur8A
 
 ## Implementation
 My implementation starts by sweeping a capsule (of the same dimensions as the player's character) in the direction of the player's last movement input. 
@@ -35,6 +37,9 @@ At the end of the ability, the player's health is set to its maximum value from 
 Recall has 1 starting charge and 1 max charge, on a 15 second cooldown.
 
 Recall is bound to `E`.
+
+Video (Current Implementation): https://www.youtube.com/watch?v=CZR3G1ZqM18
+Video (WIP Implementation): https://www.youtube.com/watch?v=c5dm0MxTlEo
 
 ## Implementation
 I created an `FRecallData` struct that stores the data for any given point in time. This includes the character's location, rotation (specifically, their `APawn::GetControlRotation()`) and health. 
@@ -81,6 +86,8 @@ The bomb can stick to surfaces and players. Once a bomb is stuck to an object/pl
 Pulse Bomb has 0 starting charges and 1 max charge, on a 20 second cooldown. 
 
 Pulse Bomb is bound to `Q`
+
+Video: https://www.youtube.com/watch?v=fQI7dhT90UY
 
 ## Implementation
 The pulse bomb is implemented in two parts- the projectile and the ability. The projectile is an `AActor` that is responsible for properties like the radius of the explosion, its damage, and its movement. The action is simply a means to spawn the projectile. 

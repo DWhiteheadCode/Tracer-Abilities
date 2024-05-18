@@ -39,6 +39,7 @@ Recall has 1 starting charge and 1 max charge, on a 15 second cooldown.
 Recall is bound to `E`.
 
 Video (Current Implementation): https://www.youtube.com/watch?v=CZR3G1ZqM18
+
 Video (WIP Implementation): https://www.youtube.com/watch?v=c5dm0MxTlEo
 
 ## Implementation

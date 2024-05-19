@@ -33,9 +33,14 @@ void UTAction::StartAction_Implementation()
 		return;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Started Action: %s"), *GetNameSafe(this));
-
 	UTActionComponent* const ActionComp = GetOwningComponent();
+
+	if (!ActionComp)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to start action [%s] as it didn't have an owning ActionComponent"), *GetNameSafe(this));
+		return;
+	}
+
 	ActionComp->ActiveGameplayTags.AppendTags(GrantsTags);
 	bIsRunning = true;	
 	
@@ -53,6 +58,7 @@ void UTAction::StartAction_Implementation()
 	}	
 
 	OnActionStarted.Broadcast(CurrentCharges);
+	UE_LOG(LogTemp, Log, TEXT("Started Action: %s"), *GetNameSafe(this));
 }
 
 void UTAction::StopAction_Implementation()

@@ -72,6 +72,13 @@ void UTAction::StopAction_Implementation()
 	UE_LOG(LogTemp, Log, TEXT("Stopped Action: %s"), *GetNameSafe(this));
 
 	UTActionComponent* const ActionComp = GetOwningComponent();
+
+	if (!ActionComp)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to stop action [%s] as it didn't have an owning ActionComponent"), *GetNameSafe(this));
+		return;
+	}
+
 	ActionComp->ActiveGameplayTags.RemoveTags(GrantsTags);
 
 	bIsRunning = false;

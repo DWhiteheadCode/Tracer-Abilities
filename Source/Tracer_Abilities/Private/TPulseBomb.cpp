@@ -93,19 +93,22 @@ void ATPulseBomb::Explode()
 
 int ATPulseBomb::CalculateDamage(AActor* const ActorToDamage) const
 {
-	if (! ensureMsgf(MinDamage_Range > 0.f, TEXT("MinDamage_Range must be > 0")))
+	if (MinDamage_Range <= 0.f)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("PulseBomb MinDamage_Range must be > 0. Returning 0 damage."));
 		return 0;
 	}
 
-	if (!ensureMsgf(MaxDamage_Range > 0.f, TEXT("MaxDamage_Range must be > 0")))
+	if (MaxDamage_Range <= 0.f)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("PulseBomb MaxDamage_Range must be > 0. Returning 0 damage."));
 		return 0;
 	}
 
 	// Without this check, more damage could be dealt the further away the target is from the bomb 
-	if (!ensureMsgf(MinDamage_Range >= MaxDamage_Range, TEXT("MinDamage_Range must be >= MaxDamage_Range")))
+	if (MinDamage_Range <= MaxDamage_Range)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("MinDamage_Range must be > MaxDamage_Range. Returning 0 damage"));
 		return 0;
 	}
 
@@ -119,7 +122,6 @@ int ATPulseBomb::CalculateDamage(AActor* const ActorToDamage) const
 	{
 		return 0;
 	}
-
 
 	const float Distance = FVector::Distance(GetActorLocation(), ActorToDamage->GetActorLocation());
 

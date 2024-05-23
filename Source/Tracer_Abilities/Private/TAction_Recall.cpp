@@ -8,13 +8,9 @@
 #include "THealthComponent.h"
 #include "../Tracer_Abilities.h"
 
-DECLARE_CYCLE_STAT(TEXT("UpdateActorTransform"), STAT_UpdateActorTransform, STATGROUP_Tracer);
-DECLARE_CYCLE_STAT(TEXT("UpdateActorTransform.NewSegment"), STAT_UpdateActorTransformNewSegment, STATGROUP_Tracer);
-
 UTAction_Recall::UTAction_Recall()
 {
 	ActiveDuration = 1.5f;
-	bSetAutoEndTimer = false; // Recall manually handles ending of action
 }
 
 void UTAction_Recall::BeginPlay()
@@ -31,47 +27,214 @@ void UTAction_Recall::BeginPlay()
 	OwningCharacter = Cast<ACharacter>(OwningComp->GetOwner());
 	if (!OwningCharacter)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Recall BeginPlay had nullptr OwningCharacter. PushRecallData and MaxQueue timers will not start."));
+		UE_LOG(LogTemp, Warning, TEXT("Recall BeginPlay had nullptr OwningCharacter. No recall data will be saved"));
 		return;
 	}
 
 	// Save initial position
 	PushRecallData();
 
-	OwningComp->GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle_PushRecallData, this, &UTAction_Recall::PushRecallData, PushInterval, true);
-	OwningComp->GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle_MaxQueueSize, this, &UTAction_Recall::OnMaxQueueTimerEnd, TimeToRecall, false);
-}
-
-
-
-
-void UTAction_Recall::PushRecallData()
-{
-	if (bQueueIsMaxSize)
+	UWorld* World = OwningComp->GetWorld();
+	if (World)
 	{
-		RecallDataArray.Pop(false); // Removes outdated data, which is not used for anything.
-	}
-	
-	if (OwningCharacter)
-	{
-		FRecallData RecallData;
-		RecallData.Location = OwningCharacter->GetActorLocation();
-		RecallData.Rotation = OwningCharacter->GetControlRotation();
+		World->GetTimerManager().SetTimer(
+			TimerHandle_PushRecallData, this, &UTAction_Recall::PushRecallData, PushInterval, true);
 
-		if (UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(
-			OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass())))
-		{
-			RecallData.Health = HealthComp->GetHealth();
-		}
-
-		RecallDataArray.Insert(RecallData, 0);
+		World->GetTimerManager().SetTimer(
+			TimerHandle_ClearOldRecallData, this, &UTAction_Recall::ClearOldRecallData, ClearInterval, true);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Recall::PushRecallData had nullptr OwningCharacter"));
+		UE_LOG(LogTemp, Warning, TEXT("Recall BeginPlay received nullptr UWorld from OwningComp. Recall data will not be saved/ cleared periodically"));
 	}
+
+	UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(
+		OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
+	if (HealthComp)
+	{
+		HealthComp->OnHealthChanged.AddDynamic(this, &UTAction_Recall::OnOwningCharacterHealthChanged);
+	}
+}
+
+void UTAction_Recall::PushRecallData()
+{
+	if (!OwningCharacter)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Recall::PushRecallData had nullptr OwningCharacter. New recall data won't be pushed."));
+		return;
+	}
+	
+	UWorld* const World = OwningCharacter->GetWorld();
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Recall::PushRecallData had nullptr World. New recall data won't be pushed."));
+		return;
+	}
+
+	FRecallData RecallData;
+	RecallData.Location = OwningCharacter->GetActorLocation();
+	RecallData.Rotation = OwningCharacter->GetControlRotation();
+	RecallData.GameTimeSeconds = World->GetTimeSeconds();
+		
+	if (UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(
+		OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass())))
+	{
+		RecallData.Health = HealthComp->GetHealth();
+	}
+
+	RecallDataArray.Insert(RecallData, 0);
+}
+
+void UTAction_Recall::ClearOldRecallData()
+{
+	UWorld* const World = OwningCharacter->GetWorld();
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Recall::ClearOldRecallData had nullptr World. Can't get current time, so data won't be cleared."));
+		return;
+	}
+
+	const float CurrentTime = World->GetTimeSeconds();
+	
+	for (int i = RecallDataArray.Num() - 1; i >= 0; i--)
+	{
+		const float RecallTime = RecallDataArray[i].GameTimeSeconds;
+
+		// If the element is more than TimeToRecall seconds old, remove it
+		if (RecallTime < CurrentTime - TimeToRecall)
+		{
+			RecallDataArray.RemoveAt(i);
+		}
+		else
+		{
+			break; // All remaining elements are more recent than the current one
+		}
+	}
+}
+
+void UTAction_Recall::StartAction_Implementation()
+{
+	if (!OwningCharacter)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't start Recall as OwningCharacter was nullptr"));
+		return;
+	}
+
+	// There should be at least 1 element, saved by a call to PushRecallData() from either the constructor or StopAction_Implementation()
+	if (RecallDataArray.Num() <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't start Recall as RecallDataArray was empty"));
+		return;
+	}
+
+	UWorld* const World = OwningCharacter->GetWorld();
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't start Recall as World was nullptr"));
+		return;
+	}
+
+	World->GetTimerManager().ClearTimer(TimerHandle_PushRecallData);
+	World->GetTimerManager().ClearTimer(TimerHandle_ClearOldRecallData);
+
+	ClearOldRecallData();
+
+	RecallStartTime = World->GetTimeSeconds();
+	
+	RecallStartPos = OwningCharacter->GetActorLocation();
+	RecallStartRot = OwningCharacter->GetActorRotation();
+
+	RecallEndPos = RecallDataArray.Last().Location;
+	RecallEndRot = RecallDataArray.Last().Rotation;
+
+	MaxRecalledHealth = 0;
+
+	for (FRecallData& RecallData : RecallDataArray)
+	{
+		MaxRecalledHealth = FMath::Max(MaxRecalledHealth, RecallData.Health);
+	}
+
+	Super::StartAction_Implementation();
+	OnActiveStateChanged(); // Must be called after Super::StartAction...(), otherwise bIsRunning won't be updated in time
+}
+
+void UTAction_Recall::Tick(float DeltaTime)
+{
+	if (!bIsRunning)
+	{
+		return;
+	}
+
+	if (!OwningCharacter)
+	{
+		return;
+	}
+
+	UWorld* const World = OwningCharacter->GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	float CurrentTime = World->GetTimeSeconds();
+	float LerpValue = (CurrentTime - RecallStartTime) / ActiveDuration;
+
+	const FVector CurrentPos = FMath::Lerp(RecallStartPos, RecallEndPos, LerpValue);
+	const FRotator CurrentRot = FMath::Lerp(RecallStartRot, RecallEndRot, LerpValue);
+
+	OwningCharacter->SetActorLocation(CurrentPos);
+	if (AController* const Controller = OwningCharacter->GetController())
+	{
+		Controller->SetControlRotation(CurrentRot);
+	}
+}
+
+void UTAction_Recall::StopAction_Implementation()
+{
+	if (OwningCharacter)
+	{
+		// Set the final transform as Tick might not have finished it
+		OwningCharacter->SetActorLocation(RecallEndPos);
+		if (AController* const Controller = OwningCharacter->GetController())
+		{
+			Controller->SetControlRotation(RecallEndRot);
+		}
+
+		UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
+		if (HealthComp)
+		{
+			if (MaxRecalledHealth > HealthComp->GetHealth())
+			{
+				HealthComp->SetHealth(MaxRecalledHealth);
+			}
+		}
+
+		UWorld* const World = OwningCharacter->GetWorld();
+		if (World)
+		{
+			World->GetTimerManager().SetTimer(
+				TimerHandle_PushRecallData, this, &UTAction_Recall::PushRecallData, PushInterval, true);
+
+			World->GetTimerManager().SetTimer(
+				TimerHandle_ClearOldRecallData, this, &UTAction_Recall::ClearOldRecallData, ClearInterval, true);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Recall StopAction() had nullptr World. Recall data WON'T be pushed or cleared periodically"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Recall::StopAction had nullptr OwningCharacter. OwningCharacter health will not be updated, and timers won't be set (PushRecallData, MaxQueue)."));
+	}
+
+	RecallDataArray.Empty();
+
+	// Prevents RecallDataArray from being empty until the next PushInterval
+	PushRecallData();
+
+	Super::StopAction_Implementation();
+	OnActiveStateChanged(); // Super is used to change bIsRunning which this function needs
 }
 
 void UTAction_Recall::OnActiveStateChanged()
@@ -102,153 +265,12 @@ void UTAction_Recall::OnActiveStateChanged()
 	}
 }
 
-void UTAction_Recall::StartAction_Implementation()
+void UTAction_Recall::OnOwningCharacterHealthChanged(UTHealthComponent* const OwningComponent, int NewHealth, int ActualDelta)
 {
-	if (!OwningCharacter)
+	if (!bIsRunning)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Couldn't start Recall as OwningCharacter was nullptr"));
-		return;
+		PushRecallData();
 	}
-
-	// There should be at least 1 element, saved by a call to PushRecallData() from either the constructor or StopAction_Implementation()
-	if (RecallDataArray.Num() <= 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Couldn't start Recall as RecallDataArray was empty"));
-		return;
-	}
-
-	Super::StartAction_Implementation();
-
-	OnActiveStateChanged();
-
-	OwningCharacter->GetWorld()->GetTimerManager().ClearTimer(TimerHandle_MaxQueueSize);
-	OwningCharacter->GetWorld()->GetTimerManager().ClearTimer(TimerHandle_PushRecallData);
-
-	CurrentRecallIndex = 0;
-
-	const float SegmentDuration = ActiveDuration / RecallDataArray.Num();
-	const float StartTime = OwningCharacter->GetWorld()->GetTimeSeconds();
-	
-	const FVector SegmentEndLocation = RecallDataArray[0].Location;
-	const FRotator SegmentEndRotation = RecallDataArray[0].Rotation;
-
-	MaxRecalledHealth = RecallDataArray[0].Health;
-
-	FTimerDelegate Delegate;
-	Delegate.BindUFunction(this, "UpdateActorTransform",
-		OwningCharacter->GetActorLocation(),
-		SegmentEndLocation,
-		OwningCharacter->GetActorRotation(),
-		SegmentEndRotation,
-		StartTime,
-		SegmentDuration
-		);
-
-	OwningCharacter->GetWorld()->GetTimerManager().SetTimer(TimerHandle_RecallSegment, Delegate, TransformUpdateInterval, true);
-}
-
-void UTAction_Recall::UpdateActorTransform(const FVector SegmentStartPos, const FVector SegmentEndPos, const FRotator SegmentStartRot, 
-	const FRotator SegmentEndRot, const float SegmentStartTime, const float SegmentDuration)
-{
-	SCOPE_CYCLE_COUNTER(STAT_UpdateActorTransform);
-
-	if (!OwningCharacter)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Recall::UpdateActorTransform had nullptr OwningCharacter"));
-		return;
-	}
-
-	const float CurrentTime = OwningCharacter->GetWorld()->GetTimeSeconds();
-	const float LerpValue = FMath::Clamp( ((CurrentTime - SegmentStartTime) / SegmentDuration), 0.f, 1.f);
-
-	const FVector CurrentPos = FMath::Lerp(SegmentStartPos, SegmentEndPos, LerpValue);
-	const FRotator CurrentRot = FMath::Lerp(SegmentStartRot, SegmentEndRot, LerpValue);
-
-	OwningCharacter->SetActorLocation(CurrentPos);
-	if (AController* const Controller = OwningCharacter->GetController())
-	{
-		Controller->SetControlRotation(CurrentRot);
-	}	
-
-	// End of current segment
-	if (LerpValue >= 1.f)
-	{
-		SCOPE_CYCLE_COUNTER(STAT_UpdateActorTransformNewSegment);
-
-		CurrentRecallIndex++;
-
-		// The last segment has just finished (i.e. the character is at the final location/rotation from this recall)
-		if (!RecallDataArray.IsValidIndex(CurrentRecallIndex))
-		{
-			CurrentRecallIndex = -1;
-			OwningCharacter->GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RecallSegment);
-
-			StopAction();
-
-			return;
-		}
-				
-		MaxRecalledHealth = FMath::Max(MaxRecalledHealth, RecallDataArray[CurrentRecallIndex].Health);
-		
-		const FVector NextSegmentStartPos = SegmentEndPos;
-		const FVector NextSegmentEndPos = RecallDataArray[CurrentRecallIndex].Location;
-
-		const FRotator NextSegmentStartRot = SegmentEndRot;
-		const FRotator NextSegmentEndRot = RecallDataArray[CurrentRecallIndex].Rotation;
-
-		FTimerDelegate Delegate;
-		Delegate.BindUFunction(this, "UpdateActorTransform",
-			NextSegmentStartPos,
-			NextSegmentEndPos,
-			NextSegmentStartRot,
-			NextSegmentEndRot,
-			CurrentTime,
-			SegmentDuration
-		);
-
-		OwningCharacter->GetWorld()->GetTimerManager().SetTimer(TimerHandle_RecallSegment, Delegate, TransformUpdateInterval, true);
-	}
-}
-
-
-void UTAction_Recall::StopAction_Implementation()
-{
-	if (OwningCharacter)
-	{
-		UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
-		if (HealthComp)
-		{		
-			if (MaxRecalledHealth > HealthComp->GetHealth())
-			{
-				HealthComp->SetHealth(MaxRecalledHealth);
-			}			
-		}		
-
-		OwningCharacter->GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle_MaxQueueSize, this, &UTAction_Recall::OnMaxQueueTimerEnd, TimeToRecall, false);
-
-		OwningComp->GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle_PushRecallData, this, &UTAction_Recall::PushRecallData, PushInterval, true);
-	}	
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Recall::StopAction had nullptr OwningCharacter. OwningCharacter health will not be updated, and timers won't be set (PushRecallData, MaxQueue)."));
-	}
-
-	RecallDataArray.Empty();
-	bQueueIsMaxSize = false;
-
-	// Prevents RecallDataArray from being empty until the next PushInterval
-	PushRecallData();
-
-	Super::StopAction_Implementation();
-
-	OnActiveStateChanged(); // Super is used to change bIsRunning
-}
-
-void UTAction_Recall::OnMaxQueueTimerEnd()
-{
-	bQueueIsMaxSize = true;
 }
 
 FText UTAction_Recall::GetNameText_Implementation() const

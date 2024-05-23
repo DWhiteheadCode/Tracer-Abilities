@@ -30,7 +30,7 @@ My implementation starts by sweeping a capsule (of the same dimensions as the pl
 Recall is the most complicated of the abilities. It rewinds the player to their location a certain number of seconds ago (by default, 3 seconds). This rewind process takes an amount of time, during which:
 - The user is both invisible and has no collision
 - The user can't perform any other inputs
-- The user is shown a rough rewind animation through where they were/ where they were looking during the time that is being rewound (i.e. the 3 seconds before the ability was used)
+- The user is shown a rewind animation that moves them from their current position and camera rotation, back to their location and camera rotation from 3 seconds ago. 
 
 At the end of the ability, the player's health is set to its maximum value from any point in time during the duration that was rewound. 
 
@@ -38,45 +38,50 @@ Recall has 1 starting charge and 1 max charge, on a 15 second cooldown.
 
 Recall is bound to `E`.
 
-Video (Current Implementation): https://www.youtube.com/watch?v=CZR3G1ZqM18
+Video (Current Implementation): https://www.youtube.com/watch?v=c5dm0MxTlEo
 
-Video (WIP Implementation - see `recall-overhaul` branch): https://www.youtube.com/watch?v=c5dm0MxTlEo
+Video (Old WIP Implementation - see `recall-archive` branch): https://www.youtube.com/watch?v=CZR3G1ZqM18
 
 ## Implementation
-I created an `FRecallData` struct that stores the data for any given point in time. This includes the character's location, rotation (specifically, their `APawn::GetControlRotation()`) and health. 
+I created an `FRecallData` struct that stores the data for any given point in time. This includes the character's location, rotation (specifically, their `APawn::GetControlRotation()`) and health, as well as the `GameTimeSeconds` that the data was taken from. 
 
-A `TArray<FRecallData>` is used to store the recall data for the entire duration that can be rewound. This array is treated somewhat like a queue, where elements at the front (lower index) are the most recent entries, while elements at the back (higher index) are the oldest entries.
+A `TArray<FRecallData>`, called `RecallDataArray`, is used to store the recall data for the entire duration that can be rewound. This array is treated somewhat like a queue, where elements at the front (lower index) are the most recent entries, while elements at the back (higher index) are the oldest entries.
 
-When the ability is initialised, a looping timer (called the `PushRecallData` timer) is started that frequently pushes a new entry into the array, using the character's current location/ rotation/ health. On initialisation, a second, non-looping, timer is started (called the `MaxQueueSize` timer) that lasts for the maximum recall length (i.e. the amount of time that will be rewound, not the amount of time that it takes for the rewind to complete). When this timer ends, a boolean flag is set that will cause the oldest entry to be popped off the array each time a new entry is about to be pushed into the array. This ensures that the array only holds data from the relevant time period. 
+When the ability is initialised, the following events occur:
+- A looping timer (called the `PushRecallData` timer) is started that frequently pushes a new entry into the array, using the character's current location/ rotation/ health. 
+- A callback is registered so that the recall action will be notified whenever it's owner's health changes. When their health changes, a new `FRecallData` entry is saved to the `RecallDataArray` to ensure no health changes are missed. 
+	- Note: A new entry is only added if the recall is not currently active. 
+- A second looping timer is started (called the `ClearOldRecallData` timer). This timer iterates through the `RecallDataArray` and removes any entries that are too old for the character to be recalled to. I.e. if the ability is configured to rewind the user to their location from 3 seconds ago, any entries from before that point (more than 3 seconds ago) are removed.
+
+This action implements `FTickableGameObject`. It is set to be a `Conditional` tickable that only ticks when the action is running (i.e. when the user is actively recalling). This is done so the player's location can be updated smoothly as they rewind towards their recall destination. 
 
 When the ability is started, the following things happen:
 - The player's character is set to be invisible, and their collision is disabled
 - The player's controller has its input disabled
-- Both the `PushRecallData` and `MaxQueueSize` timers are cleared (to prevent data changing during the recall process)
-- The duration for each segment is calculated based on the number of elements in the array and the `ActiveDuration` of the ability
-	- "Segment" refers to the time taken to rewind the character from the position/rotation from one entry in the array to the next
-	- `ActiveDuration` is the time it takes for the ability to complete (from the activation button being pressed, until the player regains control after being rewound)
-- A new looping timer (called the `RecallSegment` timer) is started, which  updates the character's position periodically
-	- The function called by this timer uses the following information:
-		- The position and rotation of the character at the start of the current segment
-		- The position and rotation of the character at the end of the current segment
-		- The time that this segment started at
-		- The duration of this segment (which is the same for all segments during a given use of the ability)
-	- Additionally, this function gets the current game time from the world timer manager
-	- This information is used to calculate an approximate position and rotation for the character at this update interval using lerp functions
-	- If enough time has passed such that the current segment has ended, information for the next segment is obtained from the array, and the timer is reset with this new information
-		- At the start of each new segment, that array entry's `Health` value is checked. If it is larger than the max value that has been previously seen (during the current ability usage), it will be recorded.
-	- Once the end of the array has been reached, the ability is stopped
+- The `PushRecallData` and `ClearOldRecallData` timers are paused
+	- This is not strictly necessary, but this approach ensures the user can't recall to somewhere they were during a previous recall (e.g. if the ability was set to have a low cooldown)
+- The `RecallDataArray` is cleared of any outdated entries (so the last element in the array is the destination for the recall)
+- The `RecallDataArray` is iterated through to find the player's highest health value during the period that will be recalled
+- The user's current location and rotation is saved, as well as the destination location and rotation for the recall (the point they will be recalled to)
+- The current game time is saved
+- The boolean responsible for the `Conditional` tickable is toggled, so `Tick(...)` starts being called
+- A timer is started that ends the ability when the `ActiveDuration` has elapsed
+
+While the ability is active, the user's location and rotation are updated using a `Lerp` function that takes the following parameters:
+- Start position or rotation
+- End position or rotation
+- Time since the ability started, divided by the total duration of the ability
 
 When the action ends, the following events occur:
+- The player's location and rotation are set to exactly match the destination 
+	- This is needed as `Tick(...)` doesn't always exactly reach the destination before the `ActiveDuration` timer ends
 - The player's health is increased to match the largest health value of any recall segment (this includes their health at the time that they started the ability)
-- The `PushRecallData` and `MaxQueueSize` timers are started again
+- The `PushRecallData` and `ClearOldRecallData` timers are started again, and the `OnHealthChanged` callback is resubscribed
 - The recall data array is emptied
-- The flag is reset to indicate that entries should not be popped off the array (until the `MaxQueueSize` timer ends again)
-- The player's character is set to be visible again, and their collision is re-enabled
-- The player's controller input is re-enabled
 - A data entry is immediately pushed into the array
 	- This prevents any issues that would occur if the cooldown were lower than the rate at which new entries are pushed into the queue, causing a potentially empty array
+- The player's character is set to be visible again, and their collision is re-enabled
+- The player's controller input is re-enabled
 
 # Pulse Bomb
 ## Description
@@ -151,10 +156,3 @@ If set to true, the following will occur:
 The playable character has access to a console command that can be accessed by typing `HealSelf`, or `HealSelf x`, where `x` is the amount you want to heal your character by (e.g. `HealSelf 10`), in the in-game console. If no value is provided, the default of 100 will be used.
 
 As the name suggests, this command is used to heal your character. If a non-positive value is entered, this command will have no effect. This command can only be used to heal up to your character's (or more specifically, your character's health component's) `HealthMax` and no higher. 
-
-## Recall Stats
-The recall ability has 2 `CYCLE_STAT`s that can be used to analyse the time taken by the `UpdateActorTransform` function. These can be accessed by typing `Stat Tracer` in the in game console.
-
-`UpdateActorTransform` refers to the entire `UpdateActorTransform()` function, while `UpdateActorTransform.NewSegment` refers only to section within this function related to setting up a new segment. 
-
-

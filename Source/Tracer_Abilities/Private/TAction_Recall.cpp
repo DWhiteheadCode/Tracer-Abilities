@@ -48,7 +48,7 @@ void UTAction_Recall::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("Recall BeginPlay received nullptr UWorld from OwningComp. Recall data will not be saved/ cleared periodically"));
 	}
 
-	UTHealthComponent* HealthComp = Cast<UTHealthComponent>(
+	UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(
 		OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
 	if (HealthComp)
 	{

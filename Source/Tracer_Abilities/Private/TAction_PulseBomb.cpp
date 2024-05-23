@@ -16,8 +16,9 @@ void UTAction_PulseBomb::StartAction_Implementation()
 {
 	Super::StartAction_Implementation();
 
-	if (!ensureMsgf(ProjectileClass, TEXT("Must set projectile subclass in blueprints for Pulse Bomb Action")))
+	if (!ProjectileClass)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("ProjectileClass must be set in Pulse Bomb Action blueprint. Action not starting."));
 		return;
 	}
 

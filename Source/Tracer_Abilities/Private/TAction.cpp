@@ -7,19 +7,16 @@
 
 UTAction::UTAction()
 {
-	bIsRunning = false;
-	bSetAutoEndTimer = true;
-
-	Cooldown = 15;
-	ActiveDuration = 5;
-		
-	MaxCharges = 1;
-	StartingCharges = 1;
-	CurrentCharges = 1;
 }
 
 void UTAction::BeginPlay()
 {
+	if (StartingCharges > MaxCharges)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Action [%s] has more StartingCharges than MaxCharges. Setting StargingCharges = MaxCharges."), *GetNameSafe(this));
+		StartingCharges = MaxCharges;
+	}
+
 	CurrentCharges = StartingCharges;
 
 	if (CurrentCharges < MaxCharges)
@@ -30,14 +27,20 @@ void UTAction::BeginPlay()
 
 void UTAction::StartAction_Implementation()
 {
-	if (!ensureAlways(CanStart()))
+	if (!CanStart())
 	{
+		UE_LOG(LogTemp, Log, TEXT("Tried to start action [%s], but CanStart() returned false"), *GetNameSafe(this));
 		return;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Started Action: %s"), *GetNameSafe(this));
+	UTActionComponent* const ActionComp = GetOwningComponent();
 
-	UTActionComponent* ActionComp = GetOwningComponent();
+	if (!ActionComp)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to start action [%s] as it didn't have an owning ActionComponent"), *GetNameSafe(this));
+		return;
+	}
+
 	ActionComp->ActiveGameplayTags.AppendTags(GrantsTags);
 	bIsRunning = true;	
 	
@@ -55,24 +58,33 @@ void UTAction::StartAction_Implementation()
 	}	
 
 	OnActionStarted.Broadcast(CurrentCharges);
+	UE_LOG(LogTemp, Log, TEXT("Started Action: %s"), *GetNameSafe(this));
 }
 
 void UTAction::StopAction_Implementation()
 {
-	if ( ! ensureAlways(bIsRunning))
+	if (!bIsRunning)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Tried to stop Action [%s], but it wasn't running"), *GetNameSafe(this));
 		return;
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("Stopped Action: %s"), *GetNameSafe(this));
 
-	UTActionComponent* ActionComp = GetOwningComponent();
+	UTActionComponent* const ActionComp = GetOwningComponent();
+
+	if (!ActionComp)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to stop action [%s] as it didn't have an owning ActionComponent"), *GetNameSafe(this));
+		return;
+	}
+
 	ActionComp->ActiveGameplayTags.RemoveTags(GrantsTags);
 
 	bIsRunning = false;
 }
 
-bool UTAction::CanStart_Implementation()
+bool UTAction::CanStart() const
 {
 	if (IsRunning())
 	{
@@ -92,7 +104,12 @@ bool UTAction::CanStart_Implementation()
 		return false;
 	}
 
-	UTActionComponent* ActionComp = GetOwningComponent();
+	UTActionComponent* const ActionComp = GetOwningComponent();
+	if (!ActionComp)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Action [%s] can't start: No ActionComponent"), *GetNameSafe(this));
+		return false;
+	}
 
 	if (ActionComp->ActiveGameplayTags.HasAny(BlockedByTags))
 	{

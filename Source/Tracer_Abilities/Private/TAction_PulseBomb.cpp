@@ -21,9 +21,10 @@ void UTAction_PulseBomb::StartAction_Implementation()
 		return;
 	}
 
-	APawn* OwningPawn = Cast<APawn>(GetOwningComponent()->GetOwner());
-	if (!ensure(OwningPawn))
+	APawn* const OwningPawn = Cast<APawn>(GetOwningComponent()->GetOwner());
+	if (!OwningPawn)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Coudln't start PulseBomb Action as OwningPawn was nullptr"));
 		return;
 	}
 
@@ -35,7 +36,7 @@ void UTAction_PulseBomb::StartAction_Implementation()
 	FVector EyeLocation;
 	OwningPawn->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
-	FTransform SpawnTM = FTransform(EyeRotation, EyeLocation);
+	const FTransform SpawnTM = FTransform(EyeRotation, EyeLocation);
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 }

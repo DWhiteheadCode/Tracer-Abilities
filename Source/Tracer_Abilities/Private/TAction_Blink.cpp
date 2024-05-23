@@ -12,39 +12,39 @@ static TAutoConsoleVariable<bool> CVarBlinkDebugLines(TEXT("t.BlinkDebug"), fals
 
 UTAction_Blink::UTAction_Blink()
 {
-	ActiveDuration = 0.1;
-	Cooldown = 10;
+	ActiveDuration = 0.1f;
+	Cooldown = 10.f;
 	
 	MaxCharges = 3;
 	StartingCharges = 3;
-
-	MaxBlinkDistance = 350;
 }
 
 void UTAction_Blink::StartAction_Implementation()
 {
 	Super::StartAction_Implementation();
 
-	UTActionComponent* OwningComp = GetOwningComponent();
-	if (!ensure(OwningComp))
+	UTActionComponent* const OwningComp = GetOwningComponent();
+	if (!OwningComp)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Tried to start Blink Action, but it didn't have OwningComp"));
 		return;
 	}
 
-	ACharacter* OwningCharacter = Cast<ACharacter>(OwningComp->GetOwner());
-	if (!ensure(OwningCharacter))
+	ACharacter* const OwningCharacter = Cast<ACharacter>(OwningComp->GetOwner());
+	if (!OwningCharacter)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Tried to start Blink Action, but it didn't have OwningCharacter"));
 		return;
 	}
 
-	FVector Destination = GetTeleportDestination(OwningCharacter);
+	const FVector Destination = GetTeleportDestination(OwningCharacter);
 
 	// Manually update the character's velocity to prevent carrying momentum in the opposite direction of the blink
-	if (UCharacterMovementComponent* MoveComp = OwningCharacter->GetCharacterMovement())
+	if (UCharacterMovementComponent* const MoveComp = OwningCharacter->GetCharacterMovement())
 	{
 		FVector OldVelocity = MoveComp->Velocity;
 		OldVelocity.Z = 0; // Ignore vertical velocity
-		float Speed = OldVelocity.Size();
+		const float Speed = OldVelocity.Size();
 
 		FVector InputDirection = OwningCharacter->GetLastMovementInputVector();
 		InputDirection.Normalize();
@@ -55,19 +55,21 @@ void UTAction_Blink::StartAction_Implementation()
 	OwningCharacter->TeleportTo(Destination, OwningCharacter->GetActorRotation());
 }
 
-FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
+FVector UTAction_Blink::GetTeleportDestination(ACharacter* const CharacterToTeleport)
 {
-	if (!ensure(CharacterToTeleport))
+	if (!CharacterToTeleport)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Blink tried to GetTeleportDestination for nullptr Character"));
 		return FVector::Zero();
 	}
 
 	FHitResult HitResult;
 
-	FVector StartLocation = CharacterToTeleport->GetActorLocation();
+	const FVector StartLocation = CharacterToTeleport->GetActorLocation();
 	FVector InputDirection = CharacterToTeleport->GetLastMovementInputVector();
 	InputDirection.Normalize();
 
+	// If no movement direction is being input, use the ActorForwardVector as input direction
 	if (InputDirection == FVector::Zero())
 	{
 		InputDirection = CharacterToTeleport->GetActorForwardVector();
@@ -87,13 +89,15 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
 
 	FCollisionShape Shape;
 
-	UCapsuleComponent* CharacterCapsule = CharacterToTeleport->GetCapsuleComponent();
-	if (ensure(CharacterCapsule))
+	UCapsuleComponent* const CharacterCapsule = CharacterToTeleport->GetCapsuleComponent();
+	if (CharacterCapsule)
 	{
 		Shape.SetCapsule(CharacterCapsule->GetScaledCapsuleRadius(), CharacterCapsule->GetScaledCapsuleHalfHeight());
 
 		FColor DebugCapsuleColor = FColor::White;
 
+		// Sweep a capsule of the same size as the character's in the input direction
+		// If it hits terrain, calculate the destination locaction based on the hit location
 		if (GetWorld()->SweepSingleByObjectType(HitResult, StartLocation, EndLocation, FQuat::Identity, Params, Shape))
 		{
 			if (CVarBlinkDebugLines.GetValueOnGameThread())
@@ -116,6 +120,10 @@ FVector UTAction_Blink::GetTeleportDestination(ACharacter* CharacterToTeleport)
 			DrawDebugCapsule(GetWorld(), EndLocation, CharacterCapsule->GetScaledCapsuleHalfHeight(),
 				CharacterCapsule->GetScaledCapsuleRadius(), FQuat::Identity, DebugCapsuleColor, false, 5.0f);
 		}		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Blink couldn't perform sweep as CharacterToTeleport didn't have a UCapsuleComponent. Using MaxBlinkDistance to calculate EndLocation."));
 	}
 
 	return EndLocation;

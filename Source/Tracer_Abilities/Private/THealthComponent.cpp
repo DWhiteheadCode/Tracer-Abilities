@@ -5,8 +5,6 @@
 
 UTHealthComponent::UTHealthComponent()
 {
-	Health = 100;
-	HealthMax = 100;
 }
 
 int UTHealthComponent::GetHealth() const
@@ -19,18 +17,19 @@ int UTHealthComponent::GetHealthMax() const
 	return HealthMax;
 }
 
-void UTHealthComponent::ApplyDamage(int Damage)
+void UTHealthComponent::ApplyDamage(const int Damage)
 {
-	if (!ensure(Damage >= 0))
+	if (Damage < 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Tried to apply negative damage (%i) to HealthComponent. Health will not change."), Damage);
 		return;
 	}
 
-	float OldHealth = Health;
+	const int OldHealth = Health;
 
 	Health = FMath::Max(0, Health - Damage);
 
-	float ActualDelta = Health - OldHealth;
+	const int ActualDelta = Health - OldHealth;
 
 	if (ActualDelta != 0)
 	{
@@ -38,18 +37,19 @@ void UTHealthComponent::ApplyDamage(int Damage)
 	}	
 }
 
-void UTHealthComponent::ApplyHeal(int Amount)
+void UTHealthComponent::ApplyHeal(const int Amount)
 {
-	if (!ensure(Amount >= 0))
+	if (Amount < 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Tried to apply negative heal (%i) to HealthComponent. Health will not change."), Amount);
 		return;
 	}
 
-	float OldHealth = Health;
+	const int OldHealth = Health;
 
 	Health = FMath::Min(Health + Amount, HealthMax);
 
-	float ActualDelta = Health - OldHealth;
+	const int ActualDelta = Health - OldHealth;
 
 	if (ActualDelta != 0)
 	{
@@ -57,12 +57,17 @@ void UTHealthComponent::ApplyHeal(int Amount)
 	}
 }
 
-void UTHealthComponent::SetHealth(int NewHealth)
+void UTHealthComponent::SetHealth(const int NewHealth)
 {
-	int OldHealth = Health;
+	if (NewHealth < 0 || NewHealth > HealthMax)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Tried to set HealthComponent Health to an out-of-bounds value [%i] which is < 0 or > HealthMax [%i]. Health will be updated, but clamped to this range."), NewHealth, HealthMax);
+	}
+
+	const int OldHealth = Health;
 	Health = FMath::Clamp(NewHealth, 0, HealthMax);
 
-	float ActualDelta = Health - OldHealth;
+	const int ActualDelta = Health - OldHealth;
 
 	if (ActualDelta != 0)
 	{

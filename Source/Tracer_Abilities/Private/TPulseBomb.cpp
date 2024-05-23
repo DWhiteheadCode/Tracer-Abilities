@@ -14,24 +14,13 @@ static TAutoConsoleVariable<bool> CVarPulseBombDebugLines(TEXT("t.PulseBombDebug
 
 ATPulseBomb::ATPulseBomb()
 {
-	StickRadius = 20;
-	ExplosionDelay = 2;
-	
-	MinDamage = 5;
-	MaxDamage = 100;
-
-	MinDamage_Range = 300;
-	MaxDamage_Range = 50;
-
-	LightFlashDelay = 0.1;
-
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
 	MeshComp->SetCollisionProfileName("NoCollision");
 	RootComponent = MeshComp;
 
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComp");
-	ProjectileMovementComp->InitialSpeed = 1250;
-	ProjectileMovementComp->ProjectileGravityScale = 3;
+	ProjectileMovementComp->InitialSpeed = 1250.f;
+	ProjectileMovementComp->ProjectileGravityScale = 3.f;
 
 	CollisionSphereComp = CreateDefaultSubobject<USphereComponent>("CollisionSphereComp");
 	CollisionSphereComp->SetupAttachment(RootComponent);
@@ -52,11 +41,6 @@ void ATPulseBomb::PostInitializeComponents()
 	CollisionSphereComp->OnComponentBeginOverlap.AddDynamic(this, &ATPulseBomb::OnBeginOverlap);
 }
 
-void ATPulseBomb::ToggleLight()
-{
-	LightComp->SetVisibility( !LightComp->IsVisible() );
-}
-
 void ATPulseBomb::BeginPlay()
 {
 	Super::BeginPlay();
@@ -64,7 +48,6 @@ void ATPulseBomb::BeginPlay()
 	GetWorldTimerManager().SetTimer(TimerHandle_LightToggle, this, &ATPulseBomb::ToggleLight, LightFlashDelay, true);
 	GetWorldTimerManager().SetTimer(TimerHandle_Explosion, this, &ATPulseBomb::Explode, ExplosionDelay, false);
 }
-
 
 void ATPulseBomb::Explode()
 {
@@ -76,24 +59,21 @@ void ATPulseBomb::Explode()
 		DrawDebugSphere(GetWorld(), GetActorLocation(), MaxDamage_Range, 16, FColor::Orange, false, 3.0f, 2, 1.0f);
 	}
 
-	GetWorldTimerManager().ClearTimer(TimerHandle_LightToggle);
-	LightComp->SetVisibility(false);
-
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 
-	TArray<AActor*> ActorsToIgnore;
+	const TArray<AActor*> ActorsToIgnore;
 	TArray<AActor*> NearbyActors;
 
 	UKismetSystemLibrary::SphereOverlapActors(this, GetActorLocation(), MinDamage_Range, ObjectTypes, nullptr, ActorsToIgnore, NearbyActors);
 
-	for (AActor* NearbyActor : NearbyActors)
+	for (AActor* const NearbyActor : NearbyActors)
 	{
 		if (NearbyActor)
 		{
-			if (UTHealthComponent* HealthComp = Cast<UTHealthComponent>(NearbyActor->GetComponentByClass(UTHealthComponent::StaticClass())))
+			if (UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(NearbyActor->GetComponentByClass(UTHealthComponent::StaticClass())))
 			{
-				float Damage = CalculateDamage(NearbyActor);
+				const int Damage = CalculateDamage(NearbyActor);
 					
 				if (Damage > 0)
 				{
@@ -103,19 +83,22 @@ void ATPulseBomb::Explode()
 		}
 	}
 
+	GetWorldTimerManager().ClearTimer(TimerHandle_LightToggle);
+	LightComp->SetVisibility(false);
+
 	MeshComp->SetVisibility(false);
 	SetActorEnableCollision(false);
 	SetLifeSpan(2.f);
 }
 
-int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
+int ATPulseBomb::CalculateDamage(AActor* const ActorToDamage) const
 {
-	if (! ensureMsgf(MinDamage_Range > 0, TEXT("MinDamage_Range must be > 0")))
+	if (! ensureMsgf(MinDamage_Range > 0.f, TEXT("MinDamage_Range must be > 0")))
 	{
 		return 0;
 	}
 
-	if (!ensureMsgf(MaxDamage_Range > 0, TEXT("MaxDamage_Range must be > 0")))
+	if (!ensureMsgf(MaxDamage_Range > 0.f, TEXT("MaxDamage_Range must be > 0")))
 	{
 		return 0;
 	}
@@ -126,8 +109,9 @@ int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 		return 0;
 	}
 
-	if (!ensure(ActorToDamage))
+	if (!ActorToDamage)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("PulseBomb tried to calculate damage for nullptr ActorToDamage"));
 		return 0;
 	}
 
@@ -137,7 +121,7 @@ int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 	}
 
 
-	float Distance = FVector::Distance(GetActorLocation(), ActorToDamage->GetActorLocation());
+	const float Distance = FVector::Distance(GetActorLocation(), ActorToDamage->GetActorLocation());
 
 	if (Distance > MinDamage_Range)
 	{
@@ -154,7 +138,7 @@ int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 	// Deal MaxDamage at MaxDamage_Range distance, scaling linearly down to MinDamage if Distance == MinDamage_Range.
 	//     The difference between MinDamage_Range and MaxDamage_Range determines how sharp the damage falloff is.
 	// Note: The case where (MinDamage_Range - MaxDamage_Range == 0) will have already been covered by the above checks.
-	int Damage = FMath::Lerp(MaxDamage, MinDamage, ( (Distance - MaxDamage_Range) / (MinDamage_Range - MaxDamage_Range) ));
+	const int Damage = FMath::Lerp(MaxDamage, MinDamage, ( (Distance - MaxDamage_Range) / (MinDamage_Range - MaxDamage_Range) ));
 
 	UE_LOG(LogTemp, Log, TEXT("Distance to bomb: %f"), Distance);
 	UE_LOG(LogTemp, Log, TEXT("Damage from bomb: %i"), Damage);
@@ -162,10 +146,11 @@ int ATPulseBomb::CalculateDamage(AActor* ActorToDamage)
 	return Damage;
 }
 
-bool ATPulseBomb::IsDamagePathBlocked(AActor* ActorToDamage)
+bool ATPulseBomb::IsDamagePathBlocked(AActor* const ActorToDamage) const
 {
-	if (!ensure(ActorToDamage))
+	if (!ActorToDamage)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Pulse Bomb tried to check IsDamagePathBlocked for nullptr ActorToDamage. Returning true."));
 		return true;
 	}
 
@@ -173,8 +158,8 @@ bool ATPulseBomb::IsDamagePathBlocked(AActor* ActorToDamage)
 	Params.AddObjectTypesToQuery(ECC_WorldDynamic); 
 	Params.AddObjectTypesToQuery(ECC_WorldStatic);
 
-	FVector StartLocation = GetActorLocation();
-	FVector EndLocation = ActorToDamage->GetActorLocation();
+	const FVector StartLocation = GetActorLocation();
+	const FVector EndLocation = ActorToDamage->GetActorLocation();
 
 	FHitResult HitResult;
 
@@ -184,6 +169,7 @@ bool ATPulseBomb::IsDamagePathBlocked(AActor* ActorToDamage)
 void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// Ensure instigator can't be stuck by their own bomb
 	if (OtherActor == GetInstigator())
 	{
 		return;
@@ -193,7 +179,7 @@ void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	CollisionSphereComp->SetGenerateOverlapEvents(false);
 
 	ProjectileMovementComp->SetVelocityInLocalSpace(FVector::Zero());
-	ProjectileMovementComp->ProjectileGravityScale = 0;
+	ProjectileMovementComp->ProjectileGravityScale = 0.f;
 
 	if (!OtherActor)
 	{
@@ -201,10 +187,10 @@ void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		return;
 	}
 
-	APawn* OtherPawn = Cast<APawn>(OtherActor);
-
 	FColor DebugColor = FColor::Blue;
 
+	// If the other actor was a pawn, attach the bomb to them
+	APawn* const OtherPawn = Cast<APawn>(OtherActor);
 	if (OtherPawn)
 	{
 		MeshComp->SetVisibility(false);
@@ -219,4 +205,9 @@ void ATPulseBomb::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		DrawDebugSphere(GetWorld(), GetActorLocation(), 5.0f, 16, DebugColor, false, 3.0f, 2, 1.0f);
 	}
+}
+
+void ATPulseBomb::ToggleLight()
+{
+	LightComp->SetVisibility(!LightComp->IsVisible());
 }

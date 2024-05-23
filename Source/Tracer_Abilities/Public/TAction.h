@@ -25,13 +25,14 @@ class TRACER_ABILITIES_API UTAction : public UObject
 public:
 	UTAction();
 
+	// MUST BE MANUALLY CALLED
 	virtual void BeginPlay();
 
 	UPROPERTY(EditAnywhere, Category = "Action")
 	FGameplayTag IdentifierTag;
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Action")
-	bool CanStart();
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	bool CanStart() const;
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	void StartAction();
@@ -61,30 +62,33 @@ public:
 	FOnChargesChanged OnCooldownEnded;
 
 protected:
+	// Tags that will be applied to the UTActionComponent while this action is running
 	UPROPERTY(EditAnywhere, Category = "Tags")
 	FGameplayTagContainer GrantsTags;
 
+	// If the UTActionComponent has any of these tags, this action will not be able to start
 	UPROPERTY(EditAnywhere, Category = "Tags")
 	FGameplayTagContainer BlockedByTags;
 
+	// Determines whether StartAction() should start a timer to call StopAction() after ActiveDuration seconds
 	UPROPERTY(EditAnywhere, Category = "Action")
-	bool bSetAutoEndTimer;
+	bool bSetAutoEndTimer = true;
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	UTActionComponent* GetOwningComponent() const;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Action")
-	bool bIsRunning;
+	bool bIsRunning = false;
 
 	// ACTIVE DURATION ---------------------------------------
 	UPROPERTY(EditAnywhere, Category = "Action")
-	float ActiveDuration;
+	float ActiveDuration = 5.f;
 
 	FTimerHandle TimerHandle_ActiveDuration;
 
 	// COOLDOWN ----------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
-	float Cooldown;
+	float Cooldown = 15.f;
 	
 	FTimerHandle TimerHandle_Cooldown;
 
@@ -98,11 +102,11 @@ protected:
 
 	// CHARGES -----------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
-	int MaxCharges;
+	int MaxCharges = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
-	int StartingCharges;
+	int StartingCharges = 1;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Action")
-	int CurrentCharges;
+	int CurrentCharges = 1;
 };

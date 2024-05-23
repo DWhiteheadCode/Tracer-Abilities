@@ -19,27 +19,29 @@ class TRACER_ABILITIES_API UTActionComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
+	void BeginPlay() override;
+	
 	UFUNCTION(BlueprintCallable, Category = "Actions")
-	void AddAction(TSubclassOf<UTAction> ActionClass);
+	void AddAction(const TSubclassOf<UTAction> ActionClass);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
-	bool StartActionByTag(FGameplayTag ActionTag);
+	bool StartActionByTag(const FGameplayTag ActionTag);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
-	bool StopActionByTag(FGameplayTag ActionTag);
+	bool StopActionByTag(const FGameplayTag ActionTag);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Tags")
-	FGameplayTagContainer ActiveGameplayTags;
-
-	void BeginPlay() override;
+	FGameplayTagContainer ActiveGameplayTags;	
 
 	UPROPERTY(BlueprintAssignable)
 	FOnActionAdded OnActionAdded;
 
 protected:
+	// An array containing all actions in this ActionComponent
 	UPROPERTY(BlueprintReadOnly)
 	TArray< TObjectPtr<UTAction> > Actions;
 	
+	// An array of actions that will be added to this ActionComponent when BeginPlay() is called
 	UPROPERTY(EditAnywhere, Category = "Actions")
 	TArray<TSubclassOf<UTAction>> DefaultActions;
 

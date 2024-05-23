@@ -85,8 +85,6 @@ void UTAction_Recall::PushRecallData()
 	RecallDataArray.Insert(RecallData, 0);
 }
 
-
-
 void UTAction_Recall::ClearOldRecallData()
 {
 	UWorld* const World = OwningCharacter->GetWorld();
@@ -113,8 +111,6 @@ void UTAction_Recall::ClearOldRecallData()
 		}
 	}
 }
-
-
 
 void UTAction_Recall::StartAction_Implementation()
 {

@@ -66,11 +66,11 @@ public:
 protected:
 	// Time between successive calls of PushRecallData()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Recall")
-	float PushInterval; 
+	float PushInterval = 0.05f; 
 
 	// Time between successive calls of ClearOldRecallData()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Recall")
-	float ClearInterval;	
+	float ClearInterval = 1.f;	
 
 	// Total amount of time to rewind by (I.e. using this action will teleport the owner back to where they were
 	// this many (TimeToRecall) seconds ago
@@ -78,7 +78,7 @@ protected:
 	// Note: This is NOT the amount of time it takes for the rewind to complete after StartAction() is called.
 	//     - That is ActiveDuration.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Recall")
-	float TimeToRecall;
+	float TimeToRecall = 3.f;
 
 	// Contains data from points in time that the recall *could* take the owner back to (or through)
 	// The front element (index 0) is the most recent point in time, while the back element (index n) is the oldest.
@@ -116,7 +116,7 @@ protected:
 
 	// CURRENT RECALL INFORMATION -------------------------------------------------------------------------
 	UPROPERTY(BlueprintReadOnly, Category = "Recall")
-	int MaxRecalledHealth;
+	int MaxRecalledHealth = 0;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Recall")
 	FVector RecallStartPos;

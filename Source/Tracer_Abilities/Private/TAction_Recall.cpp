@@ -10,12 +10,7 @@
 
 UTAction_Recall::UTAction_Recall()
 {
-	ActiveDuration = 1.5;
-
-	PushInterval = 0.05;
-	ClearInterval = 1;
-	TimeToRecall = 3;
-	MaxRecalledHealth = 0;
+	ActiveDuration = 1.5f;
 }
 
 void UTAction_Recall::BeginPlay()

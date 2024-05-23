@@ -25,7 +25,7 @@ class TRACER_ABILITIES_API UTAction : public UObject
 public:
 	UTAction();
 
-	// MUST BE MANUALLY CALLED
+	// MUST BE MANUALLY CALLED.
 	virtual void BeginPlay();
 
 	UPROPERTY(EditAnywhere, Category = "Action")
@@ -66,7 +66,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Tags")
 	FGameplayTagContainer GrantsTags;
 
-	// If the UTActionComponent has any of these tags, this action will not be able to start
+	// If the owning UTActionComponent has any of these tags, this action will not be able to start
 	UPROPERTY(EditAnywhere, Category = "Tags")
 	FGameplayTagContainer BlockedByTags;
 

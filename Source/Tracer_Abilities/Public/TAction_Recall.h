@@ -76,15 +76,15 @@ protected:
 	// this many (TimeToRecall) seconds ago
 	// 
 	// Note: This is NOT the amount of time it takes for the rewind to complete after StartAction() is called.
-	//     - That is ActiveDuration.
+	//     - That is UTAction::ActiveDuration.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Recall")
 	float TimeToRecall = 3.f;
 
 	// Contains data from points in time that the recall *could* take the owner back to (or through)
 	// The front element (index 0) is the most recent point in time, while the back element (index n) is the oldest.
 	// 
-	// Elements at the back of the array are removed once they are more than TimeToRecall seconds old (during the next PushRecallData() update)
-	// The backmost element is where the recall will position the owner, though all elements (specifically their Location) are used to "rewind" back to that point
+	// Elements at the back of the array are removed once they are more than TimeToRecall seconds old (during the next ClearOldRecallData() call)
+	// The backmost element is where the recall will position the owner once the ability ends, though all elements are used to check for the max Health value. 
 	TArray<FRecallData> RecallDataArray;
 
 	// Used to toggle certain characteristics based on whether this action is running or not. 
@@ -92,7 +92,7 @@ protected:
 	UFUNCTION()
 	void OnActiveStateChanged();
 	
-	// Adds new information to RecallDataArray based on the character's current state (i.e.: save OwningCharacter's current Location, Rotation and Health).
+	// Adds a new entry to RecallDataArray based on the character's current state (i.e.: saves OwningCharacter's current Location, Rotation and Health).
 	UFUNCTION()
 	void PushRecallData();
 

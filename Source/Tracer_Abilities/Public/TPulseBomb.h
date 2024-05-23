@@ -52,6 +52,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Balance")
 	float StickRadius = 20.f;
 
+	// Delay between bomb spawning and it exploding
 	UPROPERTY(EditAnywhere, Category = "Balance")
 	float ExplosionDelay = 2.f;
 

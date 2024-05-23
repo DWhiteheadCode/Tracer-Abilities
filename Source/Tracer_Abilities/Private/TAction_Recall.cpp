@@ -107,7 +107,7 @@ void UTAction_Recall::ClearOldRecallData()
 		}
 		else
 		{
-			break; // All remaining elements are more recent than the current one
+			break; // All remaining elements are more recent than the current one as they are sorted by GameTimeSeconds
 		}
 	}
 }
@@ -144,11 +144,12 @@ void UTAction_Recall::StartAction_Implementation()
 	RecallStartPos = OwningCharacter->GetActorLocation();
 	RecallStartRot = OwningCharacter->GetActorRotation();
 
+	// Last element is the oldest in the array. As we've called ClearOldRecallData(), this is the oldest element within the recall period
 	RecallEndPos = RecallDataArray.Last().Location;
 	RecallEndRot = RecallDataArray.Last().Rotation;
 
+	// Find the maximum health that OwningCharacter had within the recall period
 	MaxRecalledHealth = 0;
-
 	for (FRecallData& RecallData : RecallDataArray)
 	{
 		MaxRecalledHealth = FMath::Max(MaxRecalledHealth, RecallData.Health);
@@ -158,6 +159,8 @@ void UTAction_Recall::StartAction_Implementation()
 	OnActiveStateChanged(); // Must be called after Super::StartAction...(), otherwise bIsRunning won't be updated in time
 }
 
+// Sets the player to a position/rotation between their starting position & rotation (when they activated the ability) and their end position
+// & rotation (where they are recalling to). Only called while bIsRunning is true.
 void UTAction_Recall::Tick(float DeltaTime)
 {
 	if (!bIsRunning)
@@ -200,6 +203,7 @@ void UTAction_Recall::StopAction_Implementation()
 			Controller->SetControlRotation(RecallEndRot);
 		}
 
+		// If the max Health value during the recall period was more than current health, restore to that value
 		UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
 		if (HealthComp)
 		{
@@ -209,6 +213,7 @@ void UTAction_Recall::StopAction_Implementation()
 			}
 		}
 
+		// Restart timers as we now want new data to be added/ cleared
 		UWorld* const World = OwningCharacter->GetWorld();
 		if (World)
 		{

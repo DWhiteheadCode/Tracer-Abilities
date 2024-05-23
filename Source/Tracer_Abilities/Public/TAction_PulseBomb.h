@@ -6,8 +6,6 @@
 #include "TAction.h"
 #include "TAction_PulseBomb.generated.h"
 
-class ATPulseBomb;
-
 /**
  * 
  */

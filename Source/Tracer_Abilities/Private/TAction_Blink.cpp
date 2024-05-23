@@ -43,7 +43,7 @@ void UTAction_Blink::StartAction_Implementation()
 	if (UCharacterMovementComponent* const MoveComp = OwningCharacter->GetCharacterMovement())
 	{
 		FVector OldVelocity = MoveComp->Velocity;
-		OldVelocity.Z = 0; // Ignore vertical velocity
+		OldVelocity.Z = 0; // Ignore vertical component
 		const float Speed = OldVelocity.Size();
 
 		FVector InputDirection = OwningCharacter->GetLastMovementInputVector();

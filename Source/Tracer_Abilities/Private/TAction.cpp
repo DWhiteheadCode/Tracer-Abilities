@@ -46,7 +46,7 @@ void UTAction::StartAction_Implementation()
 	
 	CurrentCharges--;
 
-	// Don't reset a cooldown if it is already active. 
+	// Don't reset a cooldown if one is already active. 
 	if ( ! GetWorld()->GetTimerManager().IsTimerActive(TimerHandle_Cooldown))
 	{
 		StartCooldown();
@@ -100,7 +100,7 @@ bool UTAction::CanStart() const
 
 	if (ActiveDuration <= 0.0f)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Action [%s] can't start: Invalid ActiveDuration (must be >= 0)"), *GetNameSafe(this));
+		UE_LOG(LogTemp, Log, TEXT("Action [%s] can't start: Invalid ActiveDuration (must be > 0)"), *GetNameSafe(this));
 		return false;
 	}
 

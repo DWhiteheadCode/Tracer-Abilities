@@ -100,7 +100,7 @@ protected:
 
 	// Simply calls PushRecallData() whenever OwningCharacter's health changes to ensure no health change is missed between PushIntervals
 	UFUNCTION()
-	void OnOwningCharacterHealthChanged(UTHealthComponent* OwningComponent, int NewHealth, int ActualDelta);
+	void OnOwningCharacterHealthChanged(UTHealthComponent* const OwningComponent, int NewHealth, int ActualDelta);
 
 	// Removes all entries from RecallDataArray that are more than TimeToRecall seconds old. 
 	UFUNCTION()

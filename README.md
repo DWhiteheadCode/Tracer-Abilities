@@ -156,10 +156,3 @@ If set to true, the following will occur:
 The playable character has access to a console command that can be accessed by typing `HealSelf`, or `HealSelf x`, where `x` is the amount you want to heal your character by (e.g. `HealSelf 10`), in the in-game console. If no value is provided, the default of 100 will be used.
 
 As the name suggests, this command is used to heal your character. If a non-positive value is entered, this command will have no effect. This command can only be used to heal up to your character's (or more specifically, your character's health component's) `HealthMax` and no higher. 
-
-## Recall Stats
-The recall ability has 2 `CYCLE_STAT`s that can be used to analyse the time taken by the `UpdateActorTransform` function. These can be accessed by typing `Stat Tracer` in the in game console.
-
-`UpdateActorTransform` refers to the entire `UpdateActorTransform()` function, while `UpdateActorTransform.NewSegment` refers only to section within this function related to setting up a new segment. 
-
-

@@ -40,9 +40,8 @@ void UTAction_Recall::BeginPlay()
 	OwningComp->GetWorld()->GetTimerManager().SetTimer(
 		TimerHandle_ClearOldRecallData, this, &UTAction_Recall::ClearOldRecallData, ClearInterval, true);
 
-	UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(
-		OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
-	if (HealthComp)
+	if (UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(
+		OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass())))
 	{
 		HealthComp->OnHealthChanged.AddDynamic(this, &UTAction_Recall::OnOwningCharacterHealthChanged);
 	}
@@ -175,8 +174,8 @@ void UTAction_Recall::StopAction_Implementation()
 		}
 
 		// If the max Health value during the recall period was more than current health, restore to that value
-		UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
-		if (HealthComp)
+		if (UTHealthComponent* const HealthComp = 
+			Cast<UTHealthComponent>(OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass())))
 		{
 			if (MaxRecalledHealth > HealthComp->GetHealth())
 			{
@@ -193,7 +192,7 @@ void UTAction_Recall::StopAction_Implementation()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Recall::StopAction had nullptr OwningCharacter. OwningCharacter health will not be updated, and timers won't be set (PushRecallData, MaxQueue)."));
+		UE_LOG(LogTemp, Warning, TEXT("Recall::StopAction had nullptr OwningCharacter. OwningCharacter position, rotation and health will not be updated, and timers won't be set (PushRecallData, ClearRecallData)."));
 	}
 
 	RecallDataArray.Empty();

@@ -31,22 +31,14 @@ void UTAction_Recall::BeginPlay()
 		return;
 	}
 
-	// Save initial position
+	// Save initial position so there is never empty data
 	PushRecallData();
 
-	UWorld* World = OwningComp->GetWorld();
-	if (World)
-	{
-		World->GetTimerManager().SetTimer(
-			TimerHandle_PushRecallData, this, &UTAction_Recall::PushRecallData, PushInterval, true);
+	OwningComp->GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle_PushRecallData, this, &UTAction_Recall::PushRecallData, PushInterval, true);
 
-		World->GetTimerManager().SetTimer(
-			TimerHandle_ClearOldRecallData, this, &UTAction_Recall::ClearOldRecallData, ClearInterval, true);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Recall BeginPlay received nullptr UWorld from OwningComp. Recall data will not be saved/ cleared periodically"));
-	}
+	OwningComp->GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle_ClearOldRecallData, this, &UTAction_Recall::ClearOldRecallData, ClearInterval, true);
 
 	UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(
 		OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass()));
@@ -63,18 +55,11 @@ void UTAction_Recall::PushRecallData()
 		UE_LOG(LogTemp, Warning, TEXT("Recall::PushRecallData had nullptr OwningCharacter. New recall data won't be pushed."));
 		return;
 	}
-	
-	UWorld* const World = OwningCharacter->GetWorld();
-	if (!World)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Recall::PushRecallData had nullptr World. New recall data won't be pushed."));
-		return;
-	}
 
 	FRecallData RecallData;
 	RecallData.Location = OwningCharacter->GetActorLocation();
 	RecallData.Rotation = OwningCharacter->GetControlRotation();
-	RecallData.GameTimeSeconds = World->GetTimeSeconds();
+	RecallData.GameTimeSeconds = OwningCharacter->GetWorld()->GetTimeSeconds();
 		
 	if (UTHealthComponent* const HealthComp = Cast<UTHealthComponent>(
 		OwningCharacter->GetComponentByClass(UTHealthComponent::StaticClass())))
@@ -87,14 +72,13 @@ void UTAction_Recall::PushRecallData()
 
 void UTAction_Recall::ClearOldRecallData()
 {
-	UWorld* const World = OwningCharacter->GetWorld();
-	if (!World)
+	if (!OwningCharacter)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Recall::ClearOldRecallData had nullptr World. Can't get current time, so data won't be cleared."));
+		UE_LOG(LogTemp, Warning, TEXT("Recall::ClearOldRecallData had nullptr OwningCharacter. Can't get World (for current time), so data won't be cleared."));
 		return;
 	}
 
-	const float CurrentTime = World->GetTimeSeconds();
+	const float CurrentTime = OwningCharacter->GetWorld()->GetTimeSeconds();
 	
 	for (int i = RecallDataArray.Num() - 1; i >= 0; i--)
 	{
@@ -127,19 +111,12 @@ void UTAction_Recall::StartAction_Implementation()
 		return;
 	}
 
-	UWorld* const World = OwningCharacter->GetWorld();
-	if (!World)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Couldn't start Recall as World was nullptr"));
-		return;
-	}
-
-	World->GetTimerManager().ClearTimer(TimerHandle_PushRecallData);
-	World->GetTimerManager().ClearTimer(TimerHandle_ClearOldRecallData);
+	OwningCharacter->GetWorld()->GetTimerManager().ClearTimer(TimerHandle_PushRecallData);
+	OwningCharacter->GetWorld()->GetTimerManager().ClearTimer(TimerHandle_ClearOldRecallData);
 
 	ClearOldRecallData();
 
-	RecallStartTime = World->GetTimeSeconds();
+	RecallStartTime = OwningCharacter->GetWorld()->GetTimeSeconds();
 	
 	RecallStartPos = OwningCharacter->GetActorLocation();
 	RecallStartRot = OwningCharacter->GetActorRotation();
@@ -173,13 +150,7 @@ void UTAction_Recall::Tick(float DeltaTime)
 		return;
 	}
 
-	UWorld* const World = OwningCharacter->GetWorld();
-	if (!World)
-	{
-		return;
-	}
-
-	float CurrentTime = World->GetTimeSeconds();
+	float CurrentTime = OwningCharacter->GetWorld()->GetTimeSeconds();
 	float LerpValue = (CurrentTime - RecallStartTime) / ActiveDuration;
 
 	const FVector CurrentPos = FMath::Lerp(RecallStartPos, RecallEndPos, LerpValue);
@@ -214,19 +185,11 @@ void UTAction_Recall::StopAction_Implementation()
 		}
 
 		// Restart timers as we now want new data to be added/ cleared
-		UWorld* const World = OwningCharacter->GetWorld();
-		if (World)
-		{
-			World->GetTimerManager().SetTimer(
-				TimerHandle_PushRecallData, this, &UTAction_Recall::PushRecallData, PushInterval, true);
+		OwningCharacter->GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle_PushRecallData, this, &UTAction_Recall::PushRecallData, PushInterval, true);
 
-			World->GetTimerManager().SetTimer(
-				TimerHandle_ClearOldRecallData, this, &UTAction_Recall::ClearOldRecallData, ClearInterval, true);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Recall StopAction() had nullptr World. Recall data WON'T be pushed or cleared periodically"));
-		}
+		OwningCharacter->GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle_ClearOldRecallData, this, &UTAction_Recall::ClearOldRecallData, ClearInterval, true);
 	}
 	else
 	{

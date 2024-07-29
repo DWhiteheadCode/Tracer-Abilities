@@ -21,7 +21,7 @@ Video: https://www.youtube.com/watch?v=fE_zr3Qur8A
 My implementation starts by sweeping a capsule (of the same dimensions as the player's character) in the direction of the player's last movement input. 
 - If no movement input is provided (i.e. blink is the only key being pressed), the character's forward vector is used.
 - If this sweep does **not** result in a hit (with a `WorldStatic` or `WorldDynamic` object), the player will be teleported by the `MaxBlinkDistance` in the direction of their input. 
-- If the sweep does result in a hit, the `HitResult.ImpactPoint` is taken as a starting point. From here, the player's capsule's radius is added in the opposite direction of the sweep (i.e., from the impact point to the player's starting location). The result of this is used as the destination to teleport the player to. This is done to ensure the player is teleported up against the wall, rather than relying on UE5's `AActor::TeleportTo(...)` to resolve the collision, which can result in the teleport failing.
+- If the sweep does result in a hit, the player is teleported to the `HitResult.Location`.
 - The player's **horizontal** speed is also preserved across the blink.
 	- I.e. if the player is moving at 500 ups (units per second) to their left, then they immediately press right and blink, they will be teleported to the right, and will be moving at 500 ups to their right.
 
